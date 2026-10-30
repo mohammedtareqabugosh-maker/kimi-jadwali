@@ -15,6 +15,7 @@ import { NotesPage } from './pages/NotesPage'
 import { StatsPage } from './pages/StatsPage'
 import { EmergencyPage } from './pages/EmergencyPage'
 import { SettingsPage } from './pages/SettingsPage'
+import { SharedSchedulePage } from './pages/SharedSchedulePage'
 
 interface EditorState { initial?: Task; copy: boolean; quick: boolean; defaultType?: Task['type'] }
 interface DeleteTarget { kind: 'task' | 'goal' | 'note'; id: string; title: string }
@@ -29,8 +30,11 @@ const primaryNav: Array<{ view: View; label: string; icon: typeof Home }> = [
   { view: 'more', label: 'المزيد', icon: MoreHorizontal },
 ]
 
+const IS_BLANK_TEMPLATE = window.location.pathname.endsWith('/blank.html') || new URLSearchParams(window.location.search).get('template') === 'blank'
+
 function Brand({ compact = false }: { compact?: boolean }) {
-  return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><CalendarDays size={24} /><i /></span><div><strong>جدولي الأسبوعي</strong>{!compact && <small>Weekly Schedule</small>}</div></div>
+  const name = IS_BLANK_TEMPLATE ? 'رِفق' : 'جدولي الأسبوعي'
+  return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><CalendarDays size={24} /><i /></span><div><strong>{name}</strong>{!compact && <small>{IS_BLANK_TEMPLATE ? 'أنشئ جدولك الخاص' : 'Weekly Schedule'}</small>}</div></div>
 }
 
 export default function App() {
@@ -111,6 +115,15 @@ export default function App() {
     })
   }
 
+  const resetSelectedDay = () => {
+    updateData((current) => {
+      const completions = { ...current.completions }
+      for (const task of current.tasks.filter((item) => item.day === selectedDay)) delete completions[completionKey(selectedDate, task.id)]
+      return { ...current, completions, updatedAt: new Date().toISOString() }
+    })
+    setToast({ message: `أُعيد ضبط إنجازات يوم ${['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][selectedDay]} فقط.` })
+  }
+
   const askDeleteTask = (task: Task) => setDeleteTarget({ kind: 'task', id: task.id, title: task.title })
   const confirmDelete = () => {
     if (!deleteTarget || !data) return
@@ -132,6 +145,13 @@ export default function App() {
     setDeleteTarget(null)
   }
 
+  const importManyMealPayloads = (payloads: unknown[]) => {
+    if (!data || payloads.length === 0) return
+    let next = data
+    for (const payload of payloads) next = importMeal(next, payload).data
+    setData(next)
+  }
+
   const importMealPayload = (payload: unknown): 'imported' | 'updated' => {
     if (!data) throw new Error('البيانات غير جاهزة.')
     const result = importMeal(data, payload)
@@ -149,8 +169,8 @@ export default function App() {
   if (loadError) return <main className="fatal-state"><Brand /><h1>تعذر فتح بياناتك</h1><p>{loadError}</p><button type="button" className="primary-button" onClick={() => window.location.reload()}>إعادة المحاولة</button></main>
   if (!data) return <main className="loading-state"><Brand /><div className="loading-line"><span /></div><p>نفتح جدولك المحفوظ على هذا الجهاز…</p></main>
 
-  const shared = { data, selectedDay, selectedDate, onSelectDay: selectDay, onAdd: (quick = false) => openEditor(quick), onEdit: (task: Task) => openEditor(false, task), onDuplicate: (task: Task) => openEditor(false, task, true), onDelete: askDeleteTask, onToggle: toggleTask }
-  const activePrimary = ['notes', 'stats', 'settings', 'emergency'].includes(view) ? 'more' : view
+  const shared = { data, selectedDay, selectedDate, onSelectDay: selectDay, onResetDay: resetSelectedDay, onAdd: (quick = false) => openEditor(quick), onEdit: (task: Task) => openEditor(false, task), onDuplicate: (task: Task) => openEditor(false, task, true), onDelete: askDeleteTask, onToggle: toggleTask }
+  const activePrimary = ['notes', 'stats', 'settings', 'emergency', 'shared'].includes(view) ? 'more' : view
 
   return (
     <div className="app-shell">
@@ -159,7 +179,7 @@ export default function App() {
         <Brand />
         <nav aria-label="التنقل الرئيسي">{primaryNav.map(({ view: target, label, icon: Icon }) => <button type="button" key={target} className={activePrimary === target ? 'active' : ''} onClick={() => navigate(target)}><Icon size={20} /><span>{label}</span></button>)}</nav>
         <div className="sidebar-divider" />
-        <nav aria-label="أدوات إضافية">{[{ view: 'emergency' as View, label: 'مخرج الطوارئ', icon: Sparkles }, { view: 'notes' as View, label: 'الملاحظات', icon: NotebookPen }, { view: 'stats' as View, label: 'الإحصائيات', icon: BarChart3 }, { view: 'settings' as View, label: 'الإعدادات', icon: Settings }].map(({ view: target, label, icon: Icon }) => <button type="button" key={target} className={view === target ? 'active' : ''} onClick={() => navigate(target)}><Icon size={20} /><span>{label}</span></button>)}</nav>
+        <nav aria-label="أدوات إضافية">{[{ view: 'emergency' as View, label: 'مخرج الطوارئ', icon: Sparkles }, { view: 'notes' as View, label: 'الملاحظات', icon: NotebookPen }, { view: 'stats' as View, label: 'الإحصائيات', icon: BarChart3 }, { view: 'shared' as View, label: 'الجدول الموحد', icon: CalendarDays }, { view: 'settings' as View, label: 'الإعدادات', icon: Settings }].map(({ view: target, label, icon: Icon }) => <button type="button" key={target} className={view === target ? 'active' : ''} onClick={() => navigate(target)}><Icon size={20} /><span>{label}</span></button>)}</nav>
         <div className="sidebar-foot"><span className={`save-indicator ${saveStatus}`}><i />{saveStatus === 'saving' ? 'جارٍ الحفظ' : saveStatus === 'error' ? 'تعذر الحفظ' : 'محفوظ محليًا'}</span><small>لا حساب. لا مزامنة تلقائية.</small></div>
       </aside>
 
@@ -169,10 +189,11 @@ export default function App() {
         {view === 'home' && <HomePage {...shared} onNavigate={navigate} />}
         {view === 'schedule' && <SchedulePage {...shared} />}
         {view === 'goals' && <GoalsPage goals={data.goals} onCommit={commitGoals} onDelete={(goal) => setDeleteTarget({ kind: 'goal', id: goal.id, title: goal.name })} />}
-        {view === 'meals' && <MealsPage tasks={data.tasks} selectedDay={selectedDay} selectedDate={selectedDate} completions={data.completions} onSelectDay={selectDay} onAdd={() => openEditor(false, undefined, false, 'meal')} onToggle={toggleTask} onImport={importMealPayload} onUnlink={(task) => { updateData((current) => ({ ...current, tasks: current.tasks.map((item) => item.id === task.id ? { ...item, meal: undefined } : item) })); setToast({ message: 'أُزيل الربط وبقي موعد الوجبة في الجدول.' }) }} />}
+        {view === 'meals' && <MealsPage tasks={data.tasks} settings={data.settings} onSettings={updateSettings} selectedDay={selectedDay} selectedDate={selectedDate} completions={data.completions} onSelectDay={selectDay} onAdd={() => openEditor(false, undefined, false, 'meal')} onToggle={toggleTask} onImport={importMealPayload} onUnlink={(task) => { updateData((current) => ({ ...current, tasks: current.tasks.map((item) => item.id === task.id ? { ...item, meal: undefined } : item) })); setToast({ message: 'أُزيل الربط وبقي موعد الوجبة في الجدول.' }) }} />}
         {view === 'more' && <MorePage onNavigate={navigate} online={online} />}
         {view === 'notes' && <NotesPage notes={data.notes} tasks={data.tasks} onCommit={commitNotes} onDelete={(note) => setDeleteTarget({ kind: 'note', id: note.id, title: note.title })} />}
-        {view === 'stats' && <StatsPage data={data} selectedDate={selectedDate} />}
+        {view === 'stats' && <StatsPage data={data} selectedDate={selectedDate} onProgressChange={(patch) => updateData((current) => ({ ...current, ...patch, updatedAt: new Date().toISOString() }))} />}
+        {view === 'shared' && <SharedSchedulePage onImportMany={importManyMealPayloads} />}
         {view === 'emergency' && <EmergencyPage data={data} selectedDay={selectedDay} selectedDate={selectedDate} onApply={(tasks) => { updateData((current) => ({ ...current, tasks })); setToast({ message: 'طُبّقت التعديلات المقترحة بعد موافقتك.' }) }} />}
         {view === 'settings' && <SettingsPage data={data} onSettings={updateSettings} onReplace={(replacement) => setData(replacement)} canInstall={Boolean(installPrompt)} onInstall={install} />}
       </main>
