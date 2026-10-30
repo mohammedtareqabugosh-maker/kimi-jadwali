@@ -22,6 +22,9 @@ jobs:
           node-version: 22
       - name: Install and build
         working-directory: source
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY || secrets.VITE_SUPABASE_ANON_KEY }}
         run: corepack enable && corepack prepare pnpm@10.18.3 --activate && pnpm install --no-frozen-lockfile && pnpm run build
       - name: Replace root with the built site
         run: |
