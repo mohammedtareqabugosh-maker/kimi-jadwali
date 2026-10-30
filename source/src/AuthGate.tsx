@@ -4,6 +4,30 @@ import type { FormEvent } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { AppContent } from './App'
 import type { AppData } from './types'
+
+function mergeAccountData(local: AppData, remote: AppData): AppData {
+ const mergeById = <T extends { id: string },>(first: T[], second: T[]) => {
+  const map = new Map<string,T>()
+  for (const item of second) map.set(item.id,item)
+  for (const item of first) map.set(item.id,item)
+  return [...map.values()]
+ }
+ return {
+  ...remote,...local,
+  schemaVersion:Math.max(local.schemaVersion||1,remote.schemaVersion||1),
+  tasks:mergeById(local.tasks,remote.tasks),
+  goals:mergeById(local.goals,remote.goals),
+  notes:mergeById(local.notes,remote.notes),
+  completions:{...remote.completions,...local.completions},
+  checkins:[...new Set([...remote.checkins,...local.checkins])],
+  weightHistory:mergeById(local.weightHistory,remote.weightHistory),
+  achievements:mergeById(local.achievements,remote.achievements),
+  incidents:mergeById(local.incidents,remote.incidents),
+  settings:{...remote.settings,...local.settings,displayName:local.settings.displayName||remote.settings.displayName},
+  createdAt:[local.createdAt,remote.createdAt].filter(Boolean).sort()[0]||new Date().toISOString(),
+  updatedAt:new Date().toISOString(),
+ }
+}
 import { hasStoredData, loadData, saveData, setStorageUserId } from './lib/storage'
 import { validateBackup } from './lib/validation'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
@@ -21,7 +45,7 @@ export default function AuthGate(){
  const [session,setSession]=useState<Session|null>(null),[sessionChecked,setSessionChecked]=useState(!supabase),[ready,setReady]=useState(false),[accountError,setAccountError]=useState(''),[user,setUser]=useState<User|null>(null)
  const cloudSaveQueue=useRef<Promise<void>>(Promise.resolve())
  useEffect(()=>{if(!supabase)return;let active=true;supabase.auth.getSession().then(({data,error})=>{if(!active)return;if(error)setAccountError(error.message);setSession(data.session);setUser(data.session?.user??null);setSessionChecked(true)});const {data:listener}=supabase.auth.onAuthStateChange((event,next)=>{if(!active)return;if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED'||event==='PASSWORD_RECOVERY'){setReady(false);setAccountError('');setSession(next);setUser(next?.user??null)}});return()=>{active=false;listener.subscription.unsubscribe()}},[])
- useEffect(()=>{if(!sessionChecked||!user||!supabase)return;let active=true;(async()=>{await setStorageUserId(user.id);const localExists=await hasStoredData();const local=await loadData();const {data:row,error}=await supabase!.from('user_app_data').select('data, updated_at').eq('user_id',user.id).maybeSingle();if(error)throw error;let chosen:AppData;if(row?.data){const remote=validateBackup(row.data);const rt=Date.parse(remote.updatedAt||row.updated_at||'');const lt=Date.parse(local.updatedAt||'');const hasContent=(value:AppData)=>value.tasks.length>0||value.goals.length>0||value.notes.length>0||Object.keys(value.completions).length>0||value.checkins.length>0||value.weightHistory.length>0||value.achievements.length>0||value.incidents.length>0||Boolean(value.settings.displayName);const localHasContent=hasContent(local),remoteHasContent=hasContent(remote);chosen=localHasContent&&!remoteHasContent?local:!localHasContent&&remoteHasContent?remote:localExists&&lt>rt?local:remote}else chosen=local;const synchronized={...chosen,updatedAt:new Date().toISOString()};await saveData(synchronized);const {error:saveError}=await supabase!.from('user_app_data').upsert({user_id:user.id,data:synchronized,updated_at:synchronized.updatedAt},{onConflict:'user_id'});if(saveError)throw saveError;if(active)setReady(true)})().catch(e=>{if(active)setAccountError(e instanceof Error?e.message:'تعذّرت مزامنة بيانات الحساب.')});return()=>{active=false}},[sessionChecked,user?.id])
+ useEffect(()=>{if(!sessionChecked||!user||!supabase)return;let active=true;(async()=>{await setStorageUserId(user.id);const localExists=await hasStoredData();const local=await loadData();const {data:row,error}=await supabase!.from('user_app_data').select('data, updated_at').eq('user_id',user.id).maybeSingle();if(error)throw error;let chosen:AppData;if(row?.data){const remote=validateBackup(row.data);const hasContent=(value:AppData)=>value.tasks.length>0||value.goals.length>0||value.notes.length>0||Object.keys(value.completions).length>0||value.checkins.length>0||value.weightHistory.length>0||value.achievements.length>0||value.incidents.length>0||Boolean(value.settings.displayName);const localHasContent=hasContent(local),remoteHasContent=hasContent(remote);chosen=localHasContent&&remoteHasContent?mergeAccountData(local,remote):localHasContent?local:remote}else chosen=local;const synchronized={...chosen,updatedAt:new Date().toISOString()};await saveData(synchronized);const {error:saveError}=await supabase!.from('user_app_data').upsert({user_id:user.id,data:synchronized,updated_at:synchronized.updatedAt},{onConflict:'user_id'});if(saveError)throw saveError;if(active)setReady(true)})().catch(e=>{if(active)setAccountError(e instanceof Error?e.message:'تعذّرت مزامنة بيانات الحساب.')});return()=>{active=false}},[sessionChecked,user?.id])
  const saveCloudData=useCallback(async(data:AppData)=>{if(!supabase||!user)throw new Error('جلسة الحساب غير متاحة.');cloudSaveQueue.current=cloudSaveQueue.current.catch(()=>undefined).then(async()=>{const {error}=await supabase!.from('user_app_data').upsert({user_id:user.id,data,updated_at:data.updatedAt||new Date().toISOString()},{onConflict:'user_id'});if(error)throw error});return cloudSaveQueue.current},[user?.id])
  const signOut=useCallback(async()=>{if(!supabase)return;const {error}=await supabase.auth.signOut();if(error)setAccountError(error.message);else{setSession(null);setUser(null);setReady(false)}},[])
  if(!sessionChecked)return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><p>جارٍ التحقق من الجلسة…</p></main>
