@@ -173,7 +173,14 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
     return command.reply
   }
   const updateSettings = (settings: SettingsType) => updateData((current) => ({ ...current, settings }))
-  const signOutSafely = async () => {\n    if (data) {\n      const snapshot = { ...data, updatedAt: new Date().toISOString() }\n      try { await saveData(snapshot); await saveCloudData(snapshot) } catch (error) { setToast({ message: `تعذّر حفظ آخر تعديل قبل تسجيل الخروج: ${error instanceof Error ? error.message : 'خطأ غير معروف'}` }); return }\n    }\n    await onSignOut()\n  }\n  const install = async () => { if (!installPrompt) return; await installPrompt.prompt(); const choice = await installPrompt.userChoice; if (choice.outcome === 'accepted') setToast({ message: 'بدأ تثبيت التطبيق.' }); setInstallPrompt(null) }
+  const signOutSafely = async () => {
+    if (data) {
+      const snapshot = { ...data, updatedAt: new Date().toISOString() }
+      try { await saveData(snapshot); await saveCloudData(snapshot) } catch (error) { setToast({ message: `تعذّر حفظ آخر تعديل قبل تسجيل الخروج: ${error instanceof Error ? error.message : 'خطأ غير معروف'}` }); return }
+    }
+    await onSignOut()
+  }
+  const install = async () => { if (!installPrompt) return; await installPrompt.prompt(); const choice = await installPrompt.userChoice; if (choice.outcome === 'accepted') setToast({ message: 'بدأ تثبيت التطبيق.' }); setInstallPrompt(null) }
 
   if (loadError) return <main className="fatal-state"><Brand /><h1>تعذر فتح بياناتك</h1><p>{loadError}</p><button type="button" className="primary-button" onClick={() => window.location.reload()}>إعادة المحاولة</button></main>
   if (!data) return <main className="loading-state"><Brand /><div className="loading-line"><span /></div><p>نفتح جدولك المحفوظ على هذا الجهاز…</p></main>
@@ -193,7 +200,8 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
       </aside>
 
       <header className="mobile-header"><Brand compact /><span className={`network-badge ${online ? '' : 'offline'}`} title={online ? 'متصل' : 'غير متصل'}>{online ? <Wifi size={17} /> : <CloudOff size={17} />}<span>{online ? 'محلي' : 'دون اتصال'}</span></span></header>
-      <main className="main-content" id="main-content">\n        <div className="account-strip"><span>الحساب: {userEmail}</span><button type="button" onClick={() => { void signOutSafely() }}><LogOut size={15}/> تسجيل الخروج</button></div>
+      <main className="main-content" id="main-content">
+        <div className="account-strip"><span>الحساب: {userEmail}</span><button type="button" onClick={() => { void signOutSafely() }}><LogOut size={15}/> تسجيل الخروج</button></div>
         <div className="desktop-status"><span className={`save-indicator ${saveStatus}`}><i />{saveStatus === 'saving' ? 'جارٍ الحفظ محليًا' : saveStatus === 'error' ? 'تعذر الحفظ — راجع مساحة المتصفح' : 'كل التغييرات محفوظة محليًا'}</span><span className={`network-badge ${online ? '' : 'offline'}`}>{online ? <Wifi size={16} /> : <CloudOff size={16} />}{online ? 'متصل' : 'دون اتصال'}</span></div>
         {view === 'home' && <HomePage {...shared} onNavigate={navigate} />}
         {view === 'schedule' && <SchedulePage {...shared} />}
