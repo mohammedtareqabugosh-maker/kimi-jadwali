@@ -32,7 +32,7 @@ export function validateBackup(value: unknown): AppData {
   const now = new Date().toISOString()
   const settings = data.settings as AppData['settings']
   return {
-    schemaVersion: Number(data.schemaVersion) >= 3 ? 3 : Number(data.schemaVersion) >= 2 ? 2 : 1,
+    schemaVersion: Number(data.schemaVersion) >= 4 ? 4 : Number(data.schemaVersion) >= 3 ? 3 : Number(data.schemaVersion) >= 2 ? 2 : 1,
     tasks: data.tasks.map((task: Task) => ({
       ...task,
       title: task.title.trim(),
