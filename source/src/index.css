@@ -539,6 +539,7 @@ textarea.field { resize: vertical; min-height: 80px; }
 .auth-card { width:min(100%,440px); padding:32px 26px 24px; border:1px solid rgba(216,187,116,.22); border-radius:28px; background:rgba(25,31,27,.94); box-shadow:0 24px 80px rgba(0,0,0,.28); }
 .auth-brand-mark { position:relative; width:58px; height:58px; margin:0 auto 14px; display:grid; place-items:center; border-radius:19px; background:#b99a58; color:#151a18; font-size:34px; font-weight:800; box-shadow:inset 0 0 0 1px rgba(255,255,255,.24); }
 .auth-brand-mark span { transform:translateY(-2px); }
+.auth-brand-mark img { display:block; width:100%; height:100%; object-fit:cover; border-radius:inherit; }
 .auth-brand-mark i { position:absolute; width:7px; height:7px; border-radius:50%; top:10px; right:10px; background:#f6f0d9; }
 .auth-kicker { text-align:center; margin-bottom:5px; color:#c9ae72; font-size:12px; font-weight:800; letter-spacing:.14em; }
 .auth-card h1 { margin:0; text-align:center; font-size:29px; font-weight:800; }
