@@ -98,6 +98,7 @@ export type View =
   | 'goals'
   | 'meals'
   | 'more'
+  | 'prayers'
   | 'emergency'
   | 'notes'
   | 'stats'
