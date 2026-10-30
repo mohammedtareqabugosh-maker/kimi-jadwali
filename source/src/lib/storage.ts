@@ -4,7 +4,7 @@ import { createBlankSeedData, createSeedData } from '../data/seed'
 import { validateBackup } from './validation'
 
 const IS_BLANK_TEMPLATE = window.location.pathname.endsWith('/blank.html') || new URLSearchParams(window.location.search).get('template') === 'blank'
-const DB_NAME = IS_BLANK_TEMPLATE ? 'kimi-jadwali-public-blank-v1' : 'jadwali-weekly'
+const DB_NAME = 'kimi-jadwali-public-blank-v1'
 const STORE_NAME = 'local-data'
 const DATA_KEY = 'app-state'
 let databasePromise: Promise<IDBPDatabase> | null = null
