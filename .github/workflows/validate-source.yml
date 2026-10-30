@@ -1,0 +1,42 @@
+name: Validate NASSQ source
+
+on:
+  push:
+    branches:
+      - fix/shared-schedule-supabase-setup
+    paths:
+      - 'source/**'
+      - '.github/workflows/validate-source.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'source/**'
+      - '.github/workflows/validate-source.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.18.3 --activate
+      - name: Install dependencies
+        working-directory: source
+        run: pnpm install --no-frozen-lockfile
+      - name: Lint
+        working-directory: source
+        run: pnpm run lint
+      - name: Unit tests
+        working-directory: source
+        run: pnpm test
+      - name: Build
+        working-directory: source
+        run: pnpm run build
