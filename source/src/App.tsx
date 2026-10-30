@@ -34,8 +34,8 @@ const primaryNav: Array<{ view: View; label: string; icon: typeof Home }> = [
 const IS_BLANK_TEMPLATE = true
 
 function Brand({ compact = false }: { compact?: boolean }) {
-  const name = IS_BLANK_TEMPLATE ? 'رِفق' : 'جدولي الأسبوعي'
-  return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><CalendarDays size={24} /><i /></span><div><strong>{name}</strong>{!compact && <small>{IS_BLANK_TEMPLATE ? 'أنشئ جدولك الخاص' : 'Weekly Schedule'}</small>}</div></div>
+  const name = 'رِفق'
+  return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><CalendarDays size={24} /><i /></span><div><strong>{name}</strong>{!compact && <small>رتّب يومك بطريقتك</small>}</div></div>
 }
 
 export default function App() {
