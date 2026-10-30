@@ -1,16 +1,25 @@
 import type { AppData } from '../types'
 
-// النسخة الفارغة: لا توجد مهام ولا أهداف مبدئية. يضيف المستخدم جدوله بنفسه.
+/** Empty starter data for the public template. Never preload personal tasks. */
 export function createSeedData(): AppData {
   const now = new Date().toISOString()
   return {
-    schemaVersion: 1,
+    schemaVersion: 4,
     tasks: [],
     goals: [],
     notes: [],
     completions: {},
-    settings: { displayName: '', streakTarget: 70, theme: 'light' },
+    checkins: [],
+    weightHistory: [],
+    achievements: [],
+    incidents: [],
+    settings: { displayName: '', streakTarget: 70, theme: 'light', nutritionGoal: 'balanced' },
     createdAt: now,
     updatedAt: now,
   }
+}
+
+/** Alias used by the blank-template storage path. */
+export function createBlankSeedData(): AppData {
+  return createSeedData()
 }
