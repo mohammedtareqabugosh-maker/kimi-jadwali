@@ -44,11 +44,11 @@ export function PrayerTimesPage() {
     setLoading(true)
     setError('')
     const url = `https://api.aladhan.com/v1/timingsByCity/${currentDateKey}?city=Amman&country=Jordan&method=23`
+    const controller = new AbortController()
     const timeout = window.setTimeout(() => {
       // Abort the request if the prayer-time service does not respond.
       controller.abort()
     }, 12000)
-    const controller = new AbortController()
     const abortFromParent = () => controller.abort()
     signal.addEventListener('abort', abortFromParent, { once: true })
     try {
