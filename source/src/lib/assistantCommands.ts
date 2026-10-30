@@ -31,7 +31,7 @@ export function executeAssistantCommand(raw: string, current: AppData, selectedD
   const day = dayFrom(text, selectedDay)
   const deleteVerb = /^(احذف|حذف|امسح|الغ|شيل|ازل|ازيل)\s+/
   const addVerb = /^(ضيف|اضف|اضافة|حط|سجل|انشئ|اعمل)\s+/
-  const stripVerb = (value: string) => value.replace(/^(احذف|حذف|امسح|الغ|شيل|ازل|ازيل|ضيف|اضف|اضافة|حط|سجل|انشئ|اعمل)\s+/, '').trim()
+  const stripVerb = (value: string) => value.replace(/^(احذف|حذف|امسح|الغ|شيل|ازل|ازيل|ضيف|أضف|اضف|إضف|اضافة|حط|سجل|انشئ|اعمل)\s+/, '').trim()
 
   if (deleteVerb.test(normalized)) {
     let target = stripVerb(normalized).replace(/^(المهمة|مهمة|الوجبة|وجبة|الهدف|هدف|الملاحظة|ملاحظه|ملاحظة)\s+/, '').trim()
