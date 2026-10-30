@@ -74,8 +74,11 @@ export function PrayerTimesPage() {
 
   useEffect(() => {
     const controller = new AbortController()
-    void load(controller.signal)
-    return () => controller.abort()
+    const startTimer = window.setTimeout(() => { void load(controller.signal) }, 0)
+    return () => {
+      window.clearTimeout(startTimer)
+      controller.abort()
+    }
   }, [load, refreshKey])
 
   useEffect(() => {
