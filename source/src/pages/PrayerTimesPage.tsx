@@ -13,7 +13,14 @@ const PRAYERS = [
 ] as const
 
 function dateKey(date: Date) {
-  return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`
+  const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Amman', day: '2-digit', month: '2-digit', year: 'numeric' }).formatToParts(date)
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? ''
+  return `${part('day')}-${part('month')}-${part('year')}`
+}
+function ammanMinutes(date: Date) {
+  const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Amman', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(date)
+  const part = (type: string) => Number(parts.find((item) => item.type === type)?.value ?? 0)
+  return part('hour') * 60 + part('minute')
 }
 function cleanTime(value: string) { return value?.split(' ')[0] ?? '--:--' }
 function minutes(value: string) {
@@ -24,9 +31,9 @@ function toArabicTime(value: string) {
   const raw = cleanTime(value)
   const [hour, minute] = raw.split(':').map(Number)
   if (!Number.isFinite(hour) || !Number.isFinite(minute)) return '--:--'
-  const date = new Date()
-  date.setHours(hour, minute, 0, 0)
-  return new Intl.DateTimeFormat('ar-JO', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Amman' }).format(date)
+  // Format the API's wall-clock time as UTC so the iPhone's own timezone cannot shift it.
+  const date = new Date(Date.UTC(2020, 0, 1, hour, minute, 0))
+  return new Intl.DateTimeFormat('ar-JO', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' }).format(date)
 }
 
 export function PrayerTimesPage() {
@@ -101,7 +108,7 @@ export function PrayerTimesPage() {
     }
   }, [])
 
-  const nowMinutes = now.getHours() * 60 + now.getMinutes()
+  const nowMinutes = ammanMinutes(now)
   const nextPrayer = useMemo(
     () => timings ? PRAYERS.find((prayer) => minutes(timings[prayer.key]) > nowMinutes) ?? PRAYERS[0] : null,
     [timings, nowMinutes],
