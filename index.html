@@ -12,8 +12,26 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./icon-192.png" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <title>جدولي الأسبوعي</title>
+    <script>
+      // Keep this blank template's IndexedDB separate from the personal app.
+      (function () {
+        if (!window.indexedDB) return;
+        var originalOpen = window.indexedDB.open.bind(window.indexedDB);
+        window.indexedDB.open = function (name, version) {
+          if (name === "jadwali-weekly") name = "jadwali-weekly-blank-template";
+          return originalOpen(name, version);
+        };
+      })();
+    </script>
     <script type="module" crossorigin src="./index-AU18uXMU.js"></script>
     <link rel="stylesheet" crossorigin href="./index-BfoGGcGn.css">
+    <style>
+      .day-strip{width:100%;min-width:0;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;overflow:hidden}
+      .day-chip{min-width:0;width:100%;padding-inline:0;overflow:hidden}
+      .day-chip span{display:block;width:100%;font-size:clamp(8px,2.4vw,10px)!important;line-height:1.3;white-space:nowrap;letter-spacing:0}
+      .day-chip strong{font-size:clamp(12px,3.6vw,16px)!important;line-height:1.3}
+      @media(max-width:360px){.day-strip{padding:3px;gap:1px}.day-chip{min-height:56px;border-radius:9px}.day-chip span{font-size:8px!important}}
+    </style>
   </head>
   <body>
     <div id="root"></div>
