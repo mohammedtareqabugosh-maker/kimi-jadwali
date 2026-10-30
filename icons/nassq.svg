@@ -1,8 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
-  <title id="title">نَسَق</title>
-  <rect width="512" height="512" rx="104" fill="#17251d"/>
-  <text x="256" y="282" text-anchor="middle" direction="rtl" unicode-bidi="plaintext"
-    font-family="Tajawal, Cairo, Arial, sans-serif" font-size="142" font-weight="800"
-    fill="#f5f1e7">نسق</text>
-  <rect x="168" y="334" width="176" height="6" rx="3" fill="#b8893c"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">نسق — جدولي الأسبوعي</title><desc id="desc">أيقونة تقويم زرقاء أنيقة مع علامة إنجاز على خلفية كحلية</desc>
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#14243b"/><stop offset="1" stop-color="#071321"/></linearGradient><linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8fc4ff"/><stop offset="1" stop-color="#3978d4"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#bg)"/>
+<rect x="106" y="125" width="300" height="284" rx="38" fill="#f5f0e4"/>
+<path d="M106 163q0-38 38-38h224q38 0 38 38v48H106z" fill="url(#blue)"/>
+<path d="M177 100v56M335 100v56" stroke="#f5f0e4" stroke-width="25" stroke-linecap="round"/>
+<path d="M154 253h138M154 294h96" stroke="#162a43" stroke-width="17" stroke-linecap="round"/>
+<circle cx="347" cy="333" r="67" fill="url(#blue)" stroke="#f5f0e4" stroke-width="10"/>
+<path d="m315 333 22 22 43-48" fill="none" stroke="#10233a" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
