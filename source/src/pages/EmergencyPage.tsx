@@ -9,6 +9,7 @@ interface EmergencyPageProps {
   selectedDay: number
   selectedDate: Date
   onApply: (tasks: AppData['tasks']) => void
+  onCommand: (question: string) => string | null
 }
 
 interface HistoryItem { nodeId: string; answer?: EmergencyOption }
@@ -16,7 +17,7 @@ interface AiMessage { role: 'user' | 'assistant'; text: string }
 
 const AI_ENDPOINT = 'https://jadwali-ai.mohammedtareqabugosh.workers.dev'
 
-export function EmergencyPage({ data, selectedDay, selectedDate, onApply }: EmergencyPageProps) {
+export function EmergencyPage({ data, selectedDay, selectedDate, onApply, onCommand }: EmergencyPageProps) {
   const [history, setHistory] = useState<HistoryItem[]>([{ nodeId: 'start' }])
   const [aiQuestion, setAiQuestion] = useState('')
   const [aiMessages, setAiMessages] = useState<AiMessage[]>([])
@@ -50,6 +51,11 @@ export function EmergencyPage({ data, selectedDay, selectedDate, onApply }: Emer
     setAiMessages(nextMessages)
     setAiQuestion('')
     setAiError('')
+    const commandReply = onCommand(question)
+    if (commandReply !== null) {
+      setAiMessages([...nextMessages, { role: 'assistant', text: commandReply }])
+      return
+    }
     setAiBusy(true)
     try {
       const response = await fetch(AI_ENDPOINT, {
@@ -80,9 +86,9 @@ export function EmergencyPage({ data, selectedDay, selectedDate, onApply }: Emer
   }
 
   return <div className="page-stack emergency-page">
-    <section className="page-heading"><div><span className="section-kicker">مساعد محلي · يعمل دون إنترنت</span><h1>مخرج الطوارئ</h1><p>محادثة قائمة على قواعد واضحة، تقرأ مهامك المتبقية ولا تطبّق تغييرًا قبل موافقتك.</p></div><button type="button" className="secondary-button" onClick={restart}><RefreshCw size={18} /> محادثة جديدة</button></section>
+    <section className="page-heading"><div><span className="section-kicker">مساعد محلي · يعمل دون إنترنت</span><h1>مخرج الطوارئ</h1><p>مساعد لإدارة جدولك بالأوامر العربية، بالإضافة إلى اقتراحات إعادة تنظيم اليوم.</p></div><button type="button" className="secondary-button" onClick={restart}><RefreshCw size={18} /> محادثة جديدة</button></section>
     <section className="conversation-panel" aria-label="المساعد الذكي">
-      <div className="section-heading"><div><h2><Sparkles size={20} /> اسأل الذكاء الاصطناعي</h2><p>مساعد ذكي يقترح حلولًا حسب جدول اليوم. يحتاج إلى اتصال بالإنترنت، ولا يغيّر جدولك تلقائيًا.</p></div></div>
+      <div className="section-heading"><div><h2><Sparkles size={20} /> اسأل الذكاء الاصطناعي</h2><p>يمكنك سؤاله، أو إصدار أوامر مباشرة مثل «احذف محاضرة البرمجة يوم الأحد» و«أضف مذاكرة البرمجة يوم الأحد من 19:00 إلى 20:00». أوامر الإضافة والحذف المدعومة تعمل محليًا، والأسئلة العامة تستخدم خدمة الذكاء الاصطناعي عبر الإنترنت.</p></div></div>
       {aiMessages.length > 0 && <div className="chat-history" aria-live="polite">{aiMessages.map((message, index) => <div key={index} className={message.role === 'user' ? 'user-message' : 'assistant-message'}><p>{message.text}</p></div>)}</div>}
       {aiError && <p className="form-message" role="alert">{aiError}</p>}
       <form className="form-actions" onSubmit={askAi} style={{ alignItems: 'stretch', marginTop: 14 }}>
