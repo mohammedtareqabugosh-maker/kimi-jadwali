@@ -12,7 +12,7 @@ describe('التحقق من النسخ الاحتياطية', () => {
   it('يرفض ملفًا تالفًا أو وقتًا غير صالح قبل الاستيراد', () => {
     expect(() => validateBackup({ tasks: [] })).toThrow()
     const data = createSeedData()
-    data.tasks[0].start = '99:99'
+    data.tasks.push({ id: 'invalid-time', day: 0, start: '99:99', end: '10:00', title: 'وقت غير صالح', type: 'study', notes: '', fixed: false, allowSplit: false, countsTowardsProgress: true })
     expect(() => validateBackup(data)).toThrow()
   })
 })
