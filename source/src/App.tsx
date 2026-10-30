@@ -17,6 +17,7 @@ import { StatsPage } from './pages/StatsPage'
 import { EmergencyPage } from './pages/EmergencyPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { SharedSchedulePage } from './pages/SharedSchedulePage'
+import { PrayerTimesPage } from './pages/PrayerTimesPage'
 
 interface EditorState { initial?: Task; copy: boolean; quick: boolean; defaultType?: Task['type'] }
 interface DeleteTarget { kind: 'task' | 'goal' | 'note'; id: string; title: string }
@@ -185,7 +186,7 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
   if (!data) return <main className="loading-state"><Brand /><div className="loading-line"><span /></div><p>نفتح جدولك المحفوظ على هذا الجهاز…</p></main>
 
   const shared = { data, selectedDay, selectedDate, onSelectDay: selectDay, onResetDay: resetSelectedDay, onAdd: (quick = false) => openEditor(quick), onEdit: (task: Task) => openEditor(false, task), onDuplicate: (task: Task) => openEditor(false, task, true), onDelete: askDeleteTask, onToggle: toggleTask }
-  const activePrimary = ['notes', 'stats', 'settings', 'emergency', 'shared'].includes(view) ? 'more' : view
+  const activePrimary = ['notes', 'stats', 'settings', 'emergency', 'shared', 'prayers'].includes(view) ? 'more' : view
 
   return (
     <div className="app-shell">
@@ -194,7 +195,7 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
         <Brand />
         <nav aria-label="التنقل الرئيسي">{primaryNav.map(({ view: target, label, icon: Icon }) => <button type="button" key={target} className={activePrimary === target ? 'active' : ''} onClick={() => navigate(target)}><Icon size={20} /><span>{label}</span></button>)}</nav>
         <div className="sidebar-divider" />
-        <nav aria-label="أدوات إضافية">{[{ view: 'emergency' as View, label: 'مخرج الطوارئ', icon: Sparkles }, { view: 'notes' as View, label: 'الملاحظات', icon: NotebookPen }, { view: 'stats' as View, label: 'الإحصائيات', icon: BarChart3 }, { view: 'shared' as View, label: 'الجدول الموحد', icon: CalendarDays }, { view: 'settings' as View, label: 'الإعدادات', icon: Settings }].map(({ view: target, label, icon: Icon }) => <button type="button" key={target} className={view === target ? 'active' : ''} onClick={() => navigate(target)}><Icon size={20} /><span>{label}</span></button>)}</nav>
+        <nav aria-label="أدوات إضافية">{[{ view: 'emergency' as View, label: 'مخرج الطوارئ', icon: Sparkles }, { view: 'prayers' as View, label: 'جدول الصلوات', icon: CalendarDays }, { view: 'notes' as View, label: 'الملاحظات', icon: NotebookPen }, { view: 'stats' as View, label: 'الإحصائيات', icon: BarChart3 }, { view: 'shared' as View, label: 'الجدول الموحد', icon: CalendarDays }, { view: 'settings' as View, label: 'الإعدادات', icon: Settings }].map(({ view: target, label, icon: Icon }) => <button type="button" key={target} className={view === target ? 'active' : ''} onClick={() => navigate(target)}><Icon size={20} /><span>{label}</span></button>)}</nav>
         <div className="sidebar-foot"><span className={`save-indicator ${saveStatus}`}><i />{saveStatus === 'saving' ? 'جارٍ الحفظ' : saveStatus === 'error' ? 'تعذر الحفظ' : 'محفوظ محليًا'}</span><small>لا حساب. لا مزامنة تلقائية.</small></div>
       </aside>
 
@@ -207,6 +208,7 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
         {view === 'goals' && <GoalsPage goals={data.goals} onCommit={commitGoals} onDelete={(goal) => setDeleteTarget({ kind: 'goal', id: goal.id, title: goal.name })} />}
         {view === 'meals' && <MealsPage tasks={data.tasks} settings={data.settings} onSettings={updateSettings} selectedDay={selectedDay} selectedDate={selectedDate} completions={data.completions} onSelectDay={selectDay} onAdd={() => openEditor(false, undefined, false, 'meal')} onToggle={toggleTask} onImport={importMealPayload} onUnlink={(task) => { updateData((current) => ({ ...current, tasks: current.tasks.map((item) => item.id === task.id ? { ...item, meal: undefined } : item) })); setToast({ message: 'أُزيل الربط وبقي موعد الوجبة في الجدول.' }) }} />}
         {view === 'more' && <MorePage onNavigate={navigate} online={online} />}
+        {view === 'prayers' && <PrayerTimesPage />}
         {view === 'notes' && <NotesPage notes={data.notes} tasks={data.tasks} onCommit={commitNotes} onDelete={(note) => setDeleteTarget({ kind: 'note', id: note.id, title: note.title })} />}
         {view === 'stats' && <StatsPage data={data} selectedDate={selectedDate} onProgressChange={(patch) => updateData((current) => ({ ...current, ...patch, updatedAt: new Date().toISOString() }))} />}
         {view === 'shared' && <SharedSchedulePage onImportMany={importManyMealPayloads} />}
