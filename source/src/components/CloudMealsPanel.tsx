@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+/* eslint-disable react-hooks/set-state-in-effect -- External auth/storage hydration and date-triggered async loading are intentional effects. */
 import { CloudDownload, ExternalLink, LogIn, LogOut, RefreshCw, Utensils } from 'lucide-react'
 
 const SUPABASE_URL = 'https://chcapjgjvvwpljgdffpg.supabase.co'
