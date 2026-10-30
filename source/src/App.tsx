@@ -31,8 +31,6 @@ const primaryNav: Array<{ view: View; label: string; icon: typeof Home }> = [
   { view: 'more', label: 'المزيد', icon: MoreHorizontal },
 ]
 
-const IS_BLANK_TEMPLATE = true
-
 function Brand({ compact = false }: { compact?: boolean }) {
   const name = 'نَسّق'
   return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><img src="./icons/nassq.svg" alt="" /><i /></span><div><strong>{name}</strong>{!compact && <small>كل تفاصيل يومك، بتناغم.</small>}</div></div>
