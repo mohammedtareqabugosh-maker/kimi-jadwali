@@ -55,6 +55,6 @@ export function validateBackup(value: unknown): AppData {
       nutritionGoal: settings.nutritionGoal === 'fast' ? 'fast' : 'balanced',
     },
     createdAt: typeof data.createdAt === 'string' ? data.createdAt : now,
-    updatedAt: now,
+    updatedAt: typeof data.updatedAt === 'string' ? data.updatedAt : now,
   }
 }
