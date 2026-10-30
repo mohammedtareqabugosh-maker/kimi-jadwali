@@ -62,7 +62,7 @@ export function PrayerTimesPage() {
 
   useEffect(() => {
     const controller = new AbortController()
-    void load(controller.signal)
+    const initialLoad = window.setTimeout(() => { void load(controller.signal) }, 0)
     const interval = window.setInterval(() => {
       if (document.visibilityState === 'visible') void load()
     }, 60000)
@@ -70,6 +70,7 @@ export function PrayerTimesPage() {
     document.addEventListener('visibilitychange', onVisible)
     return () => {
       controller.abort()
+      window.clearTimeout(initialLoad)
       window.clearInterval(interval)
       document.removeEventListener('visibilitychange', onVisible)
     }
