@@ -575,3 +575,35 @@ textarea.field { resize: vertical; min-height: 80px; }
 .account-strip span { min-width:0; overflow-wrap:anywhere; color:var(--muted); }
 .account-strip button { display:inline-flex; align-items:center; gap:6px; flex-shrink:0; border:1px solid var(--line); border-radius:10px; background:var(--surface-subtle); padding:7px 10px; font-size:12px; font-weight:800; }
 @media (max-width:380px) { .auth-card { padding:26px 18px 20px; } .auth-card h1 { font-size:25px; } }
+
+
+/* Daily prayer times */
+.prayer-page { gap: 18px; }
+.prayer-page .page-heading { align-items: flex-start; }
+.prayer-date-card, .prayer-next-card, .prayer-list { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); }
+.prayer-date-card { display: grid; gap: 8px; padding: 20px; }
+.prayer-location { display: flex; align-items: center; gap: 7px; color: var(--accent-strong); font-size: 13px; font-weight: 800; }
+.prayer-timezone { margin-inline-start: auto; color: var(--muted); font-size: 11px; font-weight: 600; }
+.prayer-date-card > strong { font-size: 20px; }
+.prayer-date-card > span, .prayer-date-card > small { color: var(--muted); }
+.prayer-next-card { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px; background: var(--accent-soft); border-color: var(--accent-border); }
+.prayer-next-card > div > span { color: var(--accent-strong); font-size: 13px; font-weight: 800; }
+.prayer-next-card h2 { margin: 3px 0; font-size: 25px; }
+.prayer-next-card p { margin: 0; color: var(--muted); font-size: 13px; }
+.prayer-next-card > strong { font-size: clamp(20px, 5vw, 29px); white-space: nowrap; color: var(--accent-strong); }
+.prayer-list { overflow: hidden; }
+.prayer-row { display: flex; align-items: center; gap: 13px; min-height: 74px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.prayer-row.is-next { background: var(--accent-soft); }
+.prayer-row.is-passed .prayer-icon { opacity: .55; }
+.prayer-icon { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; border-radius: 13px; background: var(--surface-subtle); color: var(--accent-strong); }
+.prayer-name { display: grid; gap: 2px; }
+.prayer-name strong { font-size: 16px; }
+.prayer-name small { color: var(--accent-strong); font-size: 11px; font-weight: 800; }
+.prayer-time { margin-inline-start: auto; font-size: 18px; white-space: nowrap; direction: rtl; }
+.prayer-sunrise { display: flex; align-items: center; gap: 9px; padding: 12px 18px; color: var(--muted); font-size: 13px; }
+.prayer-sunrise strong { margin-inline-start: auto; color: var(--ink); font-size: 15px; }
+.prayer-state { display: grid; justify-items: center; gap: 12px; padding: 28px 18px; text-align: center; }
+.prayer-state p { margin: 0; }
+.prayer-state small, .prayer-disclaimer { color: var(--muted); font-size: 12px; }
+.prayer-disclaimer { margin: 0; line-height: 1.8; }
+@media (min-width: 760px) { .prayer-page { max-width: 850px; margin-inline: auto; } .prayer-page .page-heading { flex-direction: row; align-items: center; justify-content: space-between; } .prayer-date-card { padding: 24px; } .prayer-row { padding-inline: 22px; } }
