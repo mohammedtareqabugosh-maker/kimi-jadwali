@@ -1,4 +1,4 @@
-import { DAYS_SHORT } from '../types'
+import { DAYS, DAYS_SHORT } from '../types'
 import { dateKey, formatShortDate, weekDates } from '../lib/time'
 
 interface DayStripProps {
@@ -19,7 +19,7 @@ export function DayStrip({ selectedDay, onSelect, today }: DayStripProps) {
           className={`day-chip ${selectedDay === index ? 'selected' : ''} ${dateKey(dates[index]) === todayKey ? 'today' : ''}`}
           onClick={() => onSelect(index)}
           aria-pressed={selectedDay === index}
-          aria-label={`${day} ${formatShortDate(dates[index])}`}
+          aria-label={`${DAYS[index]} ${formatShortDate(dates[index])}`}
         >
           <span>{day}</span>
           <strong>{dates[index].getDate()}</strong>
