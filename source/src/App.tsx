@@ -31,7 +31,7 @@ const primaryNav: Array<{ view: View; label: string; icon: typeof Home }> = [
   { view: 'more', label: 'المزيد', icon: MoreHorizontal },
 ]
 
-const IS_BLANK_TEMPLATE = window.location.pathname.endsWith('/blank.html') || new URLSearchParams(window.location.search).get('template') === 'blank'
+const IS_BLANK_TEMPLATE = true
 
 function Brand({ compact = false }: { compact?: boolean }) {
   const name = IS_BLANK_TEMPLATE ? 'رِفق' : 'جدولي الأسبوعي'
