@@ -32,8 +32,7 @@ const primaryNav: Array<{ view: View; label: string; icon: typeof Home }> = [
 ]
 
 function Brand({ compact = false }: { compact?: boolean }) {
-  const name = 'نَسّق'
-  return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><img src="./icons/nassq.svg" alt="" /><i /></span><div><strong>{name}</strong>{!compact && <small>كل تفاصيل يومك، بتناغم.</small>}</div></div>
+  return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><img src="./icons/nassq.svg" alt="" /><i /></span><div><strong>نَسّق</strong>{!compact && <small>كل تفاصيل يومك، بتناغم.</small>}</div></div>
 }
 
 export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail: string; onSignOut: () => Promise<void>; saveCloudData: (data: AppData) => Promise<void> }) {
