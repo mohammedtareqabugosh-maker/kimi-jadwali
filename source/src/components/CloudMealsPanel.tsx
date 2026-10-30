@@ -27,8 +27,7 @@ export function CloudMealsPanel({ selectedDate, onImport }: Props) {
     setBusy(true); setMessage('جارٍ تحميل وجبات التاريخ المحدد…')
     const start = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate())
     const end = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()+1)
-    const query = new URLSearchParams({ select: 'id,title,details,meal_type,calories,protein,carbs,fat,starts_at,source_app', user_id: `eq.${account.id}`, kind: 'eq.meal', starts_at: `gte.${start.toISOString()}`, order: 'starts_at.asc' })
-    query.append('starts_at', `lt.${end.toISOString()}`)
+    const query = new URLSearchParams({ select: 'id,title,details,meal_type,calories,protein,carbs,fat,starts_at,source_app', user_id: `eq.${account.id}`, kind: 'eq.meal', and: `(starts_at.gte.${start.toISOString()},starts_at.lt.${end.toISOString()})`, order: 'starts_at.asc' })
     try {
       const response = await fetch(`${SUPABASE_URL}/rest/v1/shared_schedule?${query.toString()}`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` } })
       const result = await response.json() as CloudMeal[] | { message?: string }
