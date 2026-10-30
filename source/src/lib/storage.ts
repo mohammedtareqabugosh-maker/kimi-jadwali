@@ -31,10 +31,9 @@ export async function loadData(): Promise<AppData> {
     }
     const validated = validateBackup(stored)
     if (validated.schemaVersion < 4) {
-      // Refresh built-in weekly schedule defaults (including university-day meals) while preserving custom tasks, goals, notes and completion history.
-      const legacyTemplateId = /^(sun_|mon_|tue_|wed_|thu_|fri_|sat_|wake_\d|work_\d|study_\d|commute_\d|meal_\d_(breakfast|dinner)|mon_online|tue_online)/
-      const fresh = IS_BLANK_TEMPLATE ? createBlankSeedData() : createSeedData()
-      const migrated = { ...validated, schemaVersion: 4, tasks: [...fresh.tasks, ...validated.tasks.filter((task) => !legacyTemplateId.test(task.id))] }
+      // Upgrade the schema marker only. Do not recreate default tasks here:
+      // doing so would resurrect tasks the user intentionally deleted.
+      const migrated = { ...validated, schemaVersion: 4 }
       await database.put(STORE_NAME, migrated, DATA_KEY)
       return migrated
     }
