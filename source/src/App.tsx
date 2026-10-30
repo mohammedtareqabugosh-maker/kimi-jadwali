@@ -4,6 +4,7 @@ import type { AppData, Goal, Note, Settings as SettingsType, Task, View } from '
 import { loadData, saveData } from './lib/storage'
 import { completionKey, weekDates } from './lib/time'
 import { importMeal } from './lib/meals'
+import { executeAssistantCommand } from './lib/assistantCommands'
 import { Modal } from './components/Modal'
 import { TaskEditor } from './components/TaskEditor'
 import { HomePage } from './pages/HomePage'
@@ -163,6 +164,16 @@ export default function App() {
 
   const commitGoals = (goals: Goal[]) => { updateData((current) => ({ ...current, goals })); setToast({ message: 'حُفظت الأهداف.' }) }
   const commitNotes = (notes: Note[]) => { updateData((current) => ({ ...current, notes })); setToast({ message: 'حُفظت الملاحظات.' }) }
+  const handleAssistantCommand = (question: string): string | null => {
+    if (!data) return null
+    const command = executeAssistantCommand(question, data, selectedDay)
+    if (!command.handled) return null
+    if (command.changed) {
+      setData(command.data)
+      setToast({ message: command.reply })
+    }
+    return command.reply
+  }
   const updateSettings = (settings: SettingsType) => updateData((current) => ({ ...current, settings }))
   const install = async () => { if (!installPrompt) return; await installPrompt.prompt(); const choice = await installPrompt.userChoice; if (choice.outcome === 'accepted') setToast({ message: 'بدأ تثبيت التطبيق.' }); setInstallPrompt(null) }
 
@@ -194,7 +205,7 @@ export default function App() {
         {view === 'notes' && <NotesPage notes={data.notes} tasks={data.tasks} onCommit={commitNotes} onDelete={(note) => setDeleteTarget({ kind: 'note', id: note.id, title: note.title })} />}
         {view === 'stats' && <StatsPage data={data} selectedDate={selectedDate} onProgressChange={(patch) => updateData((current) => ({ ...current, ...patch, updatedAt: new Date().toISOString() }))} />}
         {view === 'shared' && <SharedSchedulePage onImportMany={importManyMealPayloads} />}
-        {view === 'emergency' && <EmergencyPage data={data} selectedDay={selectedDay} selectedDate={selectedDate} onApply={(tasks) => { updateData((current) => ({ ...current, tasks })); setToast({ message: 'طُبّقت التعديلات المقترحة بعد موافقتك.' }) }} />}
+        {view === 'emergency' && <EmergencyPage data={data} selectedDay={selectedDay} selectedDate={selectedDate} onCommand={handleAssistantCommand} onApply={(tasks) => { updateData((current) => ({ ...current, tasks })); setToast({ message: 'طُبّقت التعديلات المقترحة بعد موافقتك.' }) }} />}
         {view === 'settings' && <SettingsPage data={data} onSettings={updateSettings} onReplace={(replacement) => setData(replacement)} canInstall={Boolean(installPrompt)} onInstall={install} />}
       </main>
 
