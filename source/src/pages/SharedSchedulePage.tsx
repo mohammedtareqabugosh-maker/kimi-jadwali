@@ -8,7 +8,7 @@ const SUPABASE_KEY = 'sb_publishable_9dzltRprFtyXPyg0Iul3aQ_4SU1VTG9'
 type User = { id: string; email?: string }
 type Entry = { id: string; user_id?: string; kind: 'task'|'appointment'|'meal'; title: string; details?: string; starts_at: string; meal_type?: string; calories?: number; protein?: number; source_app?: string; updated_at?: string }
 type Session = { access_token: string; refresh_token?: string; user: User }
-type Props = { onImportMany: (payloads: unknown[]) => void }
+type Props = { onImportMany: (payloads: unknown[], range: { start: string; end: string }) => void }
 const pad = (n:number) => String(n).padStart(2,'0')
 const dateKey = (d:Date) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
 const fromDateKey = (s:string) => { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d,12) }
@@ -62,7 +62,7 @@ export function SharedSchedulePage({ onImportMany }: Props) {
       if(!response.ok||!Array.isArray(result))throw new Error(result.message||'تعذّر تحميل الجدول المشترك. تحقق من إعداد جدول shared_schedule في Supabase.')
       setRows(result as Entry[])
       const payloads=(result as Entry[]).filter(row=>row.kind==='meal'&&row.starts_at).flatMap(row=>{const when=new Date(row.starts_at);return Number.isNaN(when.getTime())?[]:[{externalId:`shared-schedule-${row.id}`,name:row.title,kind:row.meal_type||'وجبة',date:dateKey(when),day:when.getDay(),start:`${pad(when.getHours())}:${pad(when.getMinutes())}`,end:endTime(when),calories:Number(row.calories)||0,protein:Number(row.protein)||0,source:'الجدول الموحد'}]})
-      onImportMany(payloads)
+      onImportMany(payloads, { start: dateKey(start), end: dateKey(end) })
       setMessage(`تم تحميل ${result.length} عنصرًا للأسبوع. ${payloads.length?'تمت مزامنة الوجبات إلى جدولك المحلي.':''}`)
     }catch(e){setMessage(e instanceof Error?e.message:'تعذر الاتصال بالجدول المشترك.')}finally{setBusy(false)}
   }
