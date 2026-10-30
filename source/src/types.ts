@@ -70,7 +70,12 @@ export interface Settings {
   displayName: string
   streakTarget: number
   theme: 'light' | 'dark'
+  nutritionGoal: 'balanced' | 'fast'
 }
+
+export interface WeightRecord { id: string; date: string; weight: number }
+export interface AchievementRecord { id: string; title: string; date: string }
+export interface IncidentRecord { id: string; date: string; text: string }
 
 export interface AppData {
   schemaVersion: number
@@ -78,6 +83,10 @@ export interface AppData {
   goals: Goal[]
   notes: Note[]
   completions: Record<string, boolean>
+  checkins: string[]
+  weightHistory: WeightRecord[]
+  achievements: AchievementRecord[]
+  incidents: IncidentRecord[]
   settings: Settings
   createdAt: string
   updatedAt: string
@@ -93,6 +102,7 @@ export type View =
   | 'notes'
   | 'stats'
   | 'settings'
+  | 'shared'
 
 export interface ReplanProposal {
   taskId: string
@@ -118,4 +128,4 @@ export const TASK_TYPE_LABELS: Record<TaskType, string> = {
 }
 
 export const DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
-export const DAYS_SHORT = ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت']
+export const DAYS_SHORT = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت']
