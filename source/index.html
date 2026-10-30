@@ -15,6 +15,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      if (new URLSearchParams(window.location.search).get("template") !== "blank") {
+        const blankUrl = new URL(window.location.href);
+        blankUrl.searchParams.set("template", "blank");
+        window.history.replaceState(null, "", blankUrl.pathname + blankUrl.search + blankUrl.hash);
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
