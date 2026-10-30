@@ -38,7 +38,7 @@ export function TaskList({ tasks, allTasks, selectedDate, completions, onToggle,
         const conflicts = findConflicts(allTasks, task)
         const current = isToday && toMinutes(task.start) <= now && now < endMinutes(task)
         return (
-          <article className={`task-row type-${task.type} ${completed ? 'completed' : ''} ${current ? 'current' : ''}`} key={task.id} data-task-id={task.id}>
+          <article className={`task-row type-${task.type} ${task.type === 'meal' && /غداء|الغداء|lunch/i.test(task.title) ? 'meal-lunch' : ''} ${completed ? 'completed' : ''} ${current ? 'current' : ''}`} key={task.id} data-task-id={task.id}>
             <div className="task-time">
               <strong>{formatTime(task.start)}</strong>
               <span>{formatDuration(durationMinutes(task.start, task.end))}</span>

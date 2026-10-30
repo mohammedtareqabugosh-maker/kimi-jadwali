@@ -1,9 +1,10 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import type { AppData } from '../types'
-import { createSeedData } from '../data/seed'
+import { createBlankSeedData, createSeedData } from '../data/seed'
 import { validateBackup } from './validation'
 
-const DB_NAME = 'jadwali-weekly-blank-template'
+const IS_BLANK_TEMPLATE = window.location.pathname.endsWith('/blank.html') || new URLSearchParams(window.location.search).get('template') === 'blank'
+const DB_NAME = IS_BLANK_TEMPLATE ? 'jadwali-weekly-template' : 'jadwali-weekly'
 const STORE_NAME = 'local-data'
 const DATA_KEY = 'app-state'
 let databasePromise: Promise<IDBPDatabase> | null = null
@@ -24,11 +25,20 @@ export async function loadData(): Promise<AppData> {
     const database = await getDatabase()
     const stored = await database.get(STORE_NAME, DATA_KEY)
     if (!stored) {
-      const seed = createSeedData()
+      const seed = IS_BLANK_TEMPLATE ? createBlankSeedData() : createSeedData()
       await database.put(STORE_NAME, seed, DATA_KEY)
       return seed
     }
-    return validateBackup(stored)
+    const validated = validateBackup(stored)
+    if (validated.schemaVersion < 4) {
+      // Refresh built-in weekly schedule defaults (including university-day meals) while preserving custom tasks, goals, notes and completion history.
+      const legacyTemplateId = /^(sun_|mon_|tue_|wed_|thu_|fri_|sat_|wake_\d|work_\d|study_\d|commute_\d|meal_\d_(breakfast|dinner)|mon_online|tue_online)/
+      const fresh = IS_BLANK_TEMPLATE ? createBlankSeedData() : createSeedData()
+      const migrated = { ...validated, schemaVersion: 3, tasks: [...fresh.tasks, ...validated.tasks.filter((task) => !legacyTemplateId.test(task.id))] }
+      await database.put(STORE_NAME, migrated, DATA_KEY)
+      return migrated
+    }
+    return validated
   } catch (error) {
     throw new Error(`تعذر قراءة البيانات المحلية: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`)
   }
