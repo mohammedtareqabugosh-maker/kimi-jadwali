@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+/* eslint-disable react-hooks/set-state-in-effect -- External auth/storage hydration and date-triggered async loading are intentional effects. */
 import type { FormEvent } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { AppContent } from './App'
