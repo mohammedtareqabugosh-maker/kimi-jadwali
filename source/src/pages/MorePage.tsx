@@ -1,9 +1,10 @@
-import { ArrowLeft, BarChart3, Cloud, CloudOff, Database, NotebookPen, Settings, ShieldCheck, Sparkles } from 'lucide-react'
+import { ArrowLeft, BarChart3, Cloud, CloudOff, Clock3, Database, NotebookPen, Settings, ShieldCheck, Sparkles } from 'lucide-react'
 import type { View } from '../types'
 
 export function MorePage({ onNavigate, online }: { onNavigate: (view: View) => void; online: boolean }) {
   const items: Array<{ view: View; title: string; description: string; icon: typeof Sparkles }> = [
     { view: 'emergency', title: 'مخرج الطوارئ', description: 'محادثة محلية لإعادة ترتيب بقية اليوم', icon: Sparkles },
+    { view: 'prayers', title: 'جدول الصلوات', description: 'مواقيت الصلاة اليومية في عمّان تتحدث تلقائيًا', icon: Clock3 },
     { view: 'notes', title: 'الملاحظات', description: 'أفكار وملاحظات مرتبطة بالأيام والمهام', icon: NotebookPen },
     { view: 'stats', title: 'الإحصائيات', description: 'تقارير يومية وأسبوعية وسجل الوزن والالتزام', icon: BarChart3 },
     { view: 'shared', title: 'الجدول الموحد والمزامنة', description: 'مزامنة المهام والوجبات بين جدولي ومساعدي الغذائي', icon: Cloud },
