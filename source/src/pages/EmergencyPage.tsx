@@ -57,9 +57,12 @@ export function EmergencyPage({ data, selectedDay, selectedDate, onApply, onComm
       return
     }
     setAiBusy(true)
+    const controller = new AbortController()
+    const requestTimeout = window.setTimeout(() => controller.abort(), 20000)
     try {
       const response = await fetch(AI_ENDPOINT, {
         method: 'POST',
+        signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           problem: question,
@@ -79,8 +82,12 @@ export function EmergencyPage({ data, selectedDay, selectedDate, onApply, onComm
       }
       setAiMessages((items) => [...items, { role: 'assistant', text: result.answer! }])
     } catch (error) {
-      setAiError(error instanceof Error ? error.message : 'تعذر الاتصال بالذكاء الاصطناعي. يمكنك استخدام المحادثة المحلية أدناه.')
+      const message = error instanceof Error && error.name === 'AbortError'
+        ? 'تأخر رد المساعد أكثر من 20 ثانية. جرّب مرة أخرى أو استخدم الأوامر المحلية.'
+        : error instanceof Error ? error.message : 'تعذر الاتصال بالذكاء الاصطناعي. يمكنك استخدام المحادثة المحلية أدناه.'
+      setAiError(message)
     } finally {
+      window.clearTimeout(requestTimeout)
       setAiBusy(false)
     }
   }
