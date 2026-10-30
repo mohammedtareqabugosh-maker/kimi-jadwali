@@ -1,7 +1,7 @@
 {
-  "name": "رِفق — جدولك وحياتك بترتيب",
-  "short_name": "رِفق",
-  "description": "مساحة عربية لتنظيم جدولك الأسبوعي والدراسة والعمل والوجبات والأهداف، مع حفظ البيانات محليًا.",
+  "name": "نَسّق | NASSQ — كل تفاصيل يومك، بتناغم.",
+  "short_name": "نَسّق",
+  "description": "نَسّق مساحة شخصية لتنظيم جدولك اليومي والدراسة والعمل والوجبات والأهداف والعادات والمهام في مكان واحد.",
   "id": "./",
   "lang": "ar",
   "dir": "rtl",
@@ -9,8 +9,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#F5F6EF",
-  "theme_color": "#58751B",
+  "background_color": "#151A18",
+  "theme_color": "#151A18",
   "categories": [
     "productivity",
     "education",
@@ -18,22 +18,10 @@
   ],
   "icons": [
     {
-      "src": "./icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
+      "src": "./icons/nassq.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "./icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icons/icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }
