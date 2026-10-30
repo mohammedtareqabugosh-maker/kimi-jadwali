@@ -26,11 +26,11 @@ grant select, insert, update on public.user_app_data to authenticated;
 
 
 ## 3. الجدول الأسبوعي المشترك بين نَسّق وصحن
-صفحة «الجدول الموحد» تستخدم جدولًا مستقلًا اسمه `public.shared_schedule`؛ إنشاء `user_app_data` وحده لا يكفي. نفّذ هذا أيضًا في SQL Editor:
+صفحة «الجدول الموحد» تستخدم جدول `public.shared_schedule`. إنشاء `user_app_data` وحده لا يكفي. نفّذ هذا أيضًا في SQL Editor:
 
 ```sql
 create table if not exists public.shared_schedule (
-  id uuid primary key default gen_random_uuid(),
+  id text primary key default gen_random_uuid()::text,
   user_id uuid not null references auth.users(id) on delete cascade,
   kind text not null check (kind in ('task', 'appointment', 'meal')),
   title text not null,
@@ -43,23 +43,32 @@ create table if not exists public.shared_schedule (
   fat numeric not null default 0,
   ingredients text not null default '',
   source_app text not null default '',
+  priority text not null default 'medium' check (priority in ('high', 'medium', 'low')),
+  progress_notes jsonb not null default '[]'::jsonb,
   updated_at timestamptz not null default now(),
   created_at timestamptz not null default now()
 );
-
-create index if not exists shared_schedule_user_starts_idx
+create index if not exists shared_schedule_user_time_idx
   on public.shared_schedule (user_id, starts_at);
 
 alter table public.shared_schedule enable row level security;
-drop policy if exists "Users manage own shared schedule" on public.shared_schedule;
-create policy "Users manage own shared schedule" on public.shared_schedule
-  for all to authenticated
-  using ((select auth.uid()) = user_id)
+drop policy if exists "Users can read own shared schedule" on public.shared_schedule;
+drop policy if exists "Users can insert own shared schedule" on public.shared_schedule;
+drop policy if exists "Users can update own shared schedule" on public.shared_schedule;
+drop policy if exists "Users can delete own shared schedule" on public.shared_schedule;
+create policy "Users can read own shared schedule" on public.shared_schedule
+  for select to authenticated using ((select auth.uid()) = user_id);
+create policy "Users can insert own shared schedule" on public.shared_schedule
+  for insert to authenticated with check ((select auth.uid()) = user_id);
+create policy "Users can update own shared schedule" on public.shared_schedule
+  for update to authenticated using ((select auth.uid()) = user_id)
   with check ((select auth.uid()) = user_id);
+create policy "Users can delete own shared schedule" on public.shared_schedule
+  for delete to authenticated using ((select auth.uid()) = user_id);
 grant select, insert, update, delete on public.shared_schedule to authenticated;
 ```
 
-تأكد أن التطبيقين يستخدمان مشروع Supabase نفسه، وأن المستخدم يسجّل الدخول بالحساب نفسه في كليهما. إذا كان جدول `shared_schedule` موجودًا بالفعل، راجع أعمدته وسياسات RLS بدل حذف بياناته أو إعادة إنشاء الجدول.
+المخطط يستخدم `id` نصيًا ليتوافق مع التطبيقين ومعرّفات الوجبات المشتركة. إذا كان الجدول موجودًا بالفعل، لا تحذفه ولا تعِد إنشاءه؛ راجع الأعمدة وسياسات RLS فقط. تأكد أيضًا أن التطبيقين يستخدمان مشروع Supabase نفسه والحساب نفسه.
 
 ## 4. البريد وGoogle
 في Authentication → URL Configuration أضف الرابطين التاليين إلى قائمة Redirect URLs (مع المسار كاملًا):
