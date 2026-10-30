@@ -143,9 +143,27 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
     setDeleteTarget(null)
   }
 
-  const importManyMealPayloads = (payloads: unknown[]) => {
-    if (!data || payloads.length === 0) return
-    let next = data
+  const importManyMealPayloads = (payloads: unknown[], range: { start: string; end: string }) => {
+    if (!data) return
+    const externalIds = new Set(payloads.map((payload) => {
+      if (!payload || typeof payload !== 'object') return ''
+      const wrapper = payload as Record<string, unknown>
+      const raw = (wrapper.meal && typeof wrapper.meal === 'object' ? wrapper.meal : wrapper) as Record<string, unknown>
+      return String(raw.externalId ?? raw.id ?? '')
+    }).filter(Boolean))
+
+    // Reconcile only items imported from the shared schedule and only within the week just fetched.
+    // Keep ordinary local meals/tasks and any other weeks untouched.
+    let next = {
+      ...data,
+      tasks: data.tasks.filter((task) => {
+        const externalId = task.meal?.externalId
+        const date = task.meal?.date
+        if (!externalId?.startsWith('shared-schedule-') || !date) return true
+        if (date < range.start || date >= range.end) return true
+        return externalIds.has(externalId)
+      }),
+    }
     for (const payload of payloads) next = importMeal(next, payload).data
     setData(next)
   }
