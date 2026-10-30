@@ -13,7 +13,15 @@
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <title>جدولي الأسبوعي</title>
     <script>
-      // Keep this blank template's IndexedDB separate from the personal app.
+      // Force the feature-complete personal build to initialize in blank-template mode.
+      if (new URLSearchParams(window.location.search).get("template") !== "blank") {
+        const blankUrl = new URL(window.location.href);
+        blankUrl.searchParams.set("template", "blank");
+        window.history.replaceState(null, "", blankUrl.pathname + blankUrl.search + blankUrl.hash);
+      }
+    </script>
+    <script>
+      // Keep this blank template database separate from the personal app.'s IndexedDB separate from the personal app.
       (function () {
         if (!window.indexedDB) return;
         var originalOpen = window.indexedDB.open.bind(window.indexedDB);
