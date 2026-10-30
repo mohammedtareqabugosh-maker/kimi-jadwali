@@ -69,7 +69,14 @@ export function tasksOverlap(a: Pick<Task, 'start' | 'end'>, b: Pick<Task, 'star
 }
 
 export function findConflicts(tasks: Task[], candidate: Task, ignoreId?: string): Task[] {
-  return tasks.filter((task) => task.day === candidate.day && task.id !== (ignoreId ?? candidate.id) && tasksOverlap(task, candidate))
+  return tasks.filter((task) => {
+    if (task.day !== candidate.day || task.id === (ignoreId ?? candidate.id) || !tasksOverlap(task, candidate)) return false
+    const work = task.type === 'work' ? task : candidate.type === 'work' ? candidate : null
+    const duringWork = work ? (work.id === task.id ? candidate : task) : null
+    if (duringWork?.type === 'online') return false
+    if (duringWork?.type === 'meal' && /استراحة|أثناء العمل|في العمل/.test(duringWork.notes)) return false
+    return true
+  })
 }
 
 export function mergeBusyIntervals(tasks: Pick<Task, 'start' | 'end'>[], from = 0, to = MINUTES_PER_DAY): Array<[number, number]> {

@@ -32,7 +32,7 @@ export function validateBackup(value: unknown): AppData {
   const now = new Date().toISOString()
   const settings = data.settings as AppData['settings']
   return {
-    schemaVersion: 1,
+    schemaVersion: Number(data.schemaVersion) >= 3 ? 3 : Number(data.schemaVersion) >= 2 ? 2 : 1,
     tasks: data.tasks.map((task: Task) => ({
       ...task,
       title: task.title.trim(),
@@ -44,10 +44,15 @@ export function validateBackup(value: unknown): AppData {
     goals: data.goals.map((goal) => ({ ...goal, description: goal.description ?? '', unit: goal.unit || 'مرة', status: goal.status ?? 'active', createdAt: goal.createdAt ?? now })),
     notes: data.notes.map((note) => ({ ...note, createdAt: note.createdAt ?? now, updatedAt: note.updatedAt ?? note.createdAt ?? now })),
     completions: Object.fromEntries(Object.entries(data.completions).filter(([, complete]) => complete === true)) as Record<string, boolean>,
+    checkins: Array.isArray(data.checkins) ? data.checkins.filter((item): item is string => typeof item === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item)) : [],
+    weightHistory: Array.isArray(data.weightHistory) ? data.weightHistory.filter((item) => item && typeof item.id === 'string' && typeof item.date === 'string' && Number.isFinite(item.weight) && item.weight > 0) : [],
+    achievements: Array.isArray(data.achievements) ? data.achievements.filter((item) => item && typeof item.id === 'string' && typeof item.title === 'string' && typeof item.date === 'string') : [],
+    incidents: Array.isArray(data.incidents) ? data.incidents.filter((item) => item && typeof item.id === 'string' && typeof item.date === 'string' && typeof item.text === 'string') : [],
     settings: {
       displayName: typeof settings.displayName === 'string' ? settings.displayName.slice(0, 80) : '',
       streakTarget: Math.min(100, Math.max(1, Number(settings.streakTarget) || 70)),
       theme: settings.theme === 'dark' ? 'dark' : 'light',
+      nutritionGoal: settings.nutritionGoal === 'fast' ? 'fast' : 'balanced',
     },
     createdAt: typeof data.createdAt === 'string' ? data.createdAt : now,
     updatedAt: now,
