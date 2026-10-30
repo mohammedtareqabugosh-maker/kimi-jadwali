@@ -34,7 +34,7 @@ export function executeAssistantCommand(raw: string, current: AppData, selectedD
   const stripVerb = (value: string) => value.replace(/^(احذف|حذف|امسح|الغ|شيل|ازل|ازيل|ضيف|أضف|اضف|إضف|اضافة|حط|سجل|انشئ|اعمل)\s+/, '').trim()
 
   if (deleteVerb.test(normalized)) {
-    let target = stripVerb(normalized).replace(/^(المهمة|مهمة|الوجبة|وجبة|الهدف|هدف|الملاحظة|ملاحظه|ملاحظة)\s+/, '').trim()
+    let target = stripVerb(normalized).replace(/^(المهمه|مهمه|الوجبه|وجبه|الهدف|هدف|الملاحظه|ملاحظه)\s+/, '').trim()
     const daySpecified = DAYS.some(d => d.names.some(name => normalized.includes(normalize(name))))
     target = target.replace(/\s+(يوم\s*)?(الاحد|الاثنين|الثلاثاء|الاربعاء|الخميس|الجمعة|السبت).*$/, '').trim()
     if (!target) return result(true, false, current, 'اكتب اسم الشيء الذي تريد حذفه، مثل: احذف محاضرة البرمجة يوم الأحد.')
@@ -83,7 +83,7 @@ export function executeAssistantCommand(raw: string, current: AppData, selectedD
     title = title.replace(/^(مهمة|موعد)\s*/, '').trim()
     if (!title) return result(true, false, current, 'اكتب اسم المهمة. مثال: أضف مذاكرة البرمجة يوم الأحد من 19:00 إلى 20:00.')
     if (start === null || end === null || end <= start) return result(true, false, current, 'اكتب اليوم ووقت البداية والنهاية، مثال: أضف مذاكرة البرمجة يوم الأحد من 19:00 إلى 20:00.')
-    const type: TaskType = /(غداء|عشاء|فطور|افطار|وجبه)/.test(normalized) ? 'meal' : /(محاضره|جامعه)/.test(normalized) ? 'university' : /(مذاكره|دراسه)/.test(normalized) ? 'study' : /رياضة/.test(normalized) ? 'sport' : /(عمل|شغل)/.test(normalized) ? 'work' : /نوم/.test(normalized) ? 'sleep' : /راحه/.test(normalized) ? 'rest' : 'personal'
+    const type: TaskType = /(غداء|عشاء|فطور|افطار|وجبه)/.test(normalized) ? 'meal' : /(محاضره|جامعه)/.test(normalized) ? 'university' : /(مذاكره|دراسه)/.test(normalized) ? 'study' : /رياضه/.test(normalized) ? 'sport' : /(عمل|شغل)/.test(normalized) ? 'work' : /نوم/.test(normalized) ? 'sleep' : /راحه/.test(normalized) ? 'rest' : 'personal'
     const task: Task = { id: createId('task'), title, type, day, start: timeLabel(start), end: timeLabel(end), notes: '', fixed: ['university', 'work', 'online'].includes(type), allowSplit: ['study', 'personal', 'other'].includes(type), countsTowardsProgress: !['sleep', 'rest'].includes(type) }
     const collision = current.tasks.find(item => item.day === day && start < (minutes(item.end) ?? 0) && end! > (minutes(item.start) ?? 0))
     if (collision) return result(true, false, current, `لم أضفها لأن وقتها يتعارض مع "${collision.title}" (${collision.start}–${collision.end}). اختر وقتًا آخر.`)
