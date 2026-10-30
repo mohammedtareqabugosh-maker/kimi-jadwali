@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-<title id="title">نسق</title><desc id="desc">اسم نسق بخط عربي مخصص باللون الكريمي على خلفية كحلية مع لمسة زرقاء</desc>
-<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#172f50"/><stop offset="1" stop-color="#07182d"/></linearGradient><linearGradient id="blue" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#8fc4ff"/><stop offset="1" stop-color="#367bd2"/></linearGradient></defs>
-<rect width="512" height="512" rx="112" fill="url(#bg)"/>
-<text x="256" y="292" text-anchor="middle" direction="rtl" unicode-bidi="plaintext" font-family="Tajawal, Noto Sans Arabic, Arial, sans-serif" font-size="142" font-weight="800" fill="#f7f0df">نسق</text>
-<circle cx="187" cy="170" r="13" fill="#8fc4ff"/><circle cx="220" cy="170" r="13" fill="#8fc4ff"/><circle cx="367" cy="170" r="13" fill="#8fc4ff"/>
-<path d="M174 337 Q286 376 391 330" fill="none" stroke="url(#blue)" stroke-width="13" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">نَسَق</title>
+  <rect width="512" height="512" rx="104" fill="#17251d"/>
+  <text x="256" y="282" text-anchor="middle" direction="rtl" unicode-bidi="plaintext"
+    font-family="Tajawal, Cairo, Arial, sans-serif" font-size="142" font-weight="800"
+    fill="#f5f1e7">نسق</text>
+  <rect x="168" y="334" width="176" height="6" rx="3" fill="#b8893c"/>
 </svg>
