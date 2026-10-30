@@ -533,3 +533,44 @@ textarea.field { resize: vertical; min-height: 80px; }
   .day-chip { min-height: 56px; border-radius: 9px; }
   .day-chip span { font-size: 8px; }
 }
+
+/* NASSQ account and authentication screens */
+.auth-page { min-height:100dvh; display:grid; place-items:center; padding:24px 16px calc(24px + env(safe-area-inset-bottom)); background:radial-gradient(ellipse at top, #28352c 0%, #151a18 55%, #101311 100%); color:#f6f3e9; }
+.auth-card { width:min(100%,440px); padding:32px 26px 24px; border:1px solid rgba(216,187,116,.22); border-radius:28px; background:rgba(25,31,27,.94); box-shadow:0 24px 80px rgba(0,0,0,.28); }
+.auth-brand-mark { position:relative; width:58px; height:58px; margin:0 auto 14px; display:grid; place-items:center; border-radius:19px; background:#b99a58; color:#151a18; font-size:34px; font-weight:800; box-shadow:inset 0 0 0 1px rgba(255,255,255,.24); }
+.auth-brand-mark span { transform:translateY(-2px); }
+.auth-brand-mark i { position:absolute; width:7px; height:7px; border-radius:50%; top:10px; right:10px; background:#f6f0d9; }
+.auth-kicker { text-align:center; margin-bottom:5px; color:#c9ae72; font-size:12px; font-weight:800; letter-spacing:.14em; }
+.auth-card h1 { margin:0; text-align:center; font-size:29px; font-weight:800; }
+.auth-subtitle { text-align:center; color:#c2c8bf; margin:5px 0 18px; }
+.auth-benefits { display:grid; gap:8px; margin:0 0 22px; color:#d7ddcf; font-size:13px; }
+.auth-benefits span { display:flex; align-items:center; gap:8px; }
+.auth-benefits svg { color:#c9ae72; flex-shrink:0; }
+.auth-form { display:grid; gap:15px; }
+.auth-form label { display:grid; gap:7px; font-size:14px; font-weight:700; color:#e7e8df; }
+.auth-input-wrap { min-height:50px; display:flex; align-items:center; gap:10px; padding:0 13px; border:1px solid #414a40; border-radius:13px; background:#151a17; color:#bba36d; }
+.auth-input-wrap:focus-within { border-color:#b99a58; box-shadow:0 0 0 3px rgba(185,154,88,.12); }
+.auth-input-wrap input { width:100%; min-width:0; border:0; outline:0; background:transparent; color:#fffdf5; direction:ltr; text-align:left; }
+.auth-input-wrap input::placeholder { color:#7f8980; }
+.auth-eye { border:0; background:transparent; color:#c4c9bf; display:grid; place-items:center; padding:4px; }
+.auth-primary,.auth-google { width:100%; min-height:49px; border-radius:13px; display:flex; align-items:center; justify-content:center; gap:10px; font-weight:800; }
+.auth-primary { border:1px solid #c8ab6c; background:#b99a58; color:#151a18; }
+.auth-primary:disabled,.auth-google:disabled { opacity:.45; cursor:not-allowed; }
+.auth-divider { display:flex; align-items:center; gap:12px; margin:18px 0; color:#929c91; font-size:12px; }
+.auth-divider:before,.auth-divider:after { content:""; flex:1; height:1px; background:#3a443a; }
+.auth-google { border:1px solid #485248; background:#202722; color:#f5f4eb; }
+.auth-links { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; margin-top:18px; }
+.auth-links button,.auth-text-button { border:0; background:transparent; color:#d4bb7c; font-size:13px; font-weight:700; padding:4px 0; }
+.auth-privacy { display:flex; align-items:center; justify-content:center; gap:6px; margin:23px 0 0; color:#8f998e; font-size:11px; text-align:center; }
+.auth-alert,.auth-error,.auth-message { padding:12px 13px; border-radius:12px; font-size:13px; margin:0 0 15px; }
+.auth-alert { border:1px solid #76603b; background:rgba(185,154,88,.09); color:#e6d7b0; }
+.auth-alert p { margin:5px 0 0; color:#c8cbbf; }
+.auth-error { background:rgba(164,68,53,.16); border:1px solid #8f493f; color:#ffb9ac; overflow-wrap:anywhere; }
+.auth-message { background:rgba(93,133,86,.15); border:1px solid #476e4c; color:#c6e4c6; }
+.auth-loading { min-height:100dvh; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:14px; padding:24px; background:#151a18; color:#f6f3e9; text-align:center; }
+.auth-loading p { max-width:440px; color:#c2c8bf; }
+.auth-loading .auth-primary { max-width:260px; }
+.account-strip { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 13px; margin-bottom:18px; border:1px solid var(--line); border-radius:14px; background:var(--surface); font-size:13px; }
+.account-strip span { min-width:0; overflow-wrap:anywhere; color:var(--muted); }
+.account-strip button { display:inline-flex; align-items:center; gap:6px; flex-shrink:0; border:1px solid var(--line); border-radius:10px; background:var(--surface-subtle); padding:7px 10px; font-size:12px; font-weight:800; }
+@media (max-width:380px) { .auth-card { padding:26px 18px 20px; } .auth-card h1 { font-size:25px; } }
