@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="جدولي" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="icon" type="image/png" sizes="512x512" href="./icon-192.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <title>جدولي الأسبوعي</title>
     <script>
@@ -20,17 +20,7 @@
         window.history.replaceState(null, "", blankUrl.pathname + blankUrl.search + blankUrl.hash);
       }
     </script>
-    <script>
-      // Keep this blank template database separate from the personal app.'s IndexedDB separate from the personal app.
-      (function () {
-        if (!window.indexedDB) return;
-        var originalOpen = window.indexedDB.open.bind(window.indexedDB);
-        window.indexedDB.open = function (name, version) {
-          if (name === "jadwali-weekly") name = "jadwali-weekly-blank-template";
-          return originalOpen(name, version);
-        };
-      })();
-    </script>
+ipt>
     <script type="module" crossorigin src="./index-full-DvIaZFq8.js"></script>
     <link rel="stylesheet" crossorigin href="./index-full-9mpymnUy.css">
     <style>
