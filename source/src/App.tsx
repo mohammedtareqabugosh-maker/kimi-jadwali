@@ -66,7 +66,7 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = setTimeout(() => {
       setSaveStatus('saving')
-      saveData(data).then(() => saveCloudData(data)).then(() => setSaveStatus('saved')).catch((error) => { setSaveStatus('error'); setToast({ message: `حُفظت البيانات على الجهاز لكن تعذّرت المزامنة: ${error.message}` }) })
+      const snapshot = { ...data, updatedAt: new Date().toISOString() }; saveData(snapshot).then(() => saveCloudData(snapshot)).then(() => setSaveStatus('saved')).catch((error) => { setSaveStatus('error'); setToast({ message: `حُفظت البيانات على الجهاز لكن تعذّرت المزامنة: ${error.message}` }) })
     }, 180)
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
   }, [data])
