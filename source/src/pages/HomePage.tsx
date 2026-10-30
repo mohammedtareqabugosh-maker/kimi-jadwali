@@ -81,6 +81,7 @@ export function HomePage({ data, selectedDay, selectedDate, onSelectDay, onAdd, 
             <div className="section-heading compact"><h2>وصول سريع</h2></div>
             <div className="shortcut-list">
               <button type="button" onClick={() => onNavigate('meals')}><Utensils size={20} /><span><strong>الوجبات</strong><small>مواعيدك وروابط مساعدي الغذائي</small></span><ArrowLeft size={17} /></button>
+              <button type="button" onClick={() => onNavigate('prayers')}><Clock3 size={20} /><span><strong>جدول الصلوات</strong><small>مواقيت عمّان والصلاة القادمة</small></span><ArrowLeft size={17} /></button>
               <button type="button" onClick={() => onNavigate('goals')}><Target size={20} /><span><strong>الأهداف</strong><small>تابع تقدمك الأسبوعي</small></span><ArrowLeft size={17} /></button>
               <button type="button" onClick={() => onNavigate('notes')}><NotebookPen size={20} /><span><strong>الملاحظات</strong><small>احفظ فكرة قبل أن تفلت</small></span><ArrowLeft size={17} /></button>
               <button type="button" className="emergency-shortcut" onClick={() => onNavigate('emergency')}><Sparkles size={20} /><span><strong>مخرج الطوارئ</strong><small>أعد ترتيب يومك دون فوضى</small></span><ArrowLeft size={17} /></button>
