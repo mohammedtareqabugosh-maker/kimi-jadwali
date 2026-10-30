@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+/* eslint-disable react-hooks/set-state-in-effect -- External auth/storage hydration and date-triggered async loading are intentional effects. */
 import { CalendarDays, Cloud, LogIn, LogOut, Plus, RefreshCw, Trash2, Utensils } from 'lucide-react'
 import { Modal } from '../components/Modal'
 
