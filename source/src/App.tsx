@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { BarChart3, CalendarDays, CloudOff, Home, MoreHorizontal, NotebookPen, Settings, Sparkles, Target, Utensils, Wifi, X } from 'lucide-react'
+import { BarChart3, CalendarDays, CloudOff, Home, LogOut, MoreHorizontal, NotebookPen, Settings, Sparkles, Target, Utensils, Wifi, X } from 'lucide-react'
 import type { AppData, Goal, Note, Settings as SettingsType, Task, View } from './types'
 import { loadData, saveData } from './lib/storage'
 import { completionKey, weekDates } from './lib/time'
@@ -38,7 +38,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
   return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><img src="./icons/nassq.svg" alt="" /><i /></span><div><strong>{name}</strong>{!compact && <small>كل تفاصيل يومك، بتناغم.</small>}</div></div>
 }
 
-export default function App() {
+export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail: string; onSignOut: () => Promise<void>; saveCloudData: (data: AppData) => Promise<void> }) {
   const [data, setData] = useState<AppData | null>(null)
   const [loadError, setLoadError] = useState('')
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved')
@@ -66,7 +66,7 @@ export default function App() {
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = setTimeout(() => {
       setSaveStatus('saving')
-      saveData(data).then(() => setSaveStatus('saved')).catch((error) => { setSaveStatus('error'); setToast({ message: error.message }) })
+      saveData(data).then(() => saveCloudData(data)).then(() => setSaveStatus('saved')).catch((error) => { setSaveStatus('error'); setToast({ message: `حُفظت البيانات على الجهاز لكن تعذّرت المزامنة: ${error.message}` }) })
     }, 180)
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
   }, [data])
@@ -195,7 +195,7 @@ export default function App() {
       </aside>
 
       <header className="mobile-header"><Brand compact /><span className={`network-badge ${online ? '' : 'offline'}`} title={online ? 'متصل' : 'غير متصل'}>{online ? <Wifi size={17} /> : <CloudOff size={17} />}<span>{online ? 'محلي' : 'دون اتصال'}</span></span></header>
-      <main className="main-content" id="main-content">
+      <main className="main-content" id="main-content">\n        <div className="account-strip"><span>الحساب: {userEmail}</span><button type="button" onClick={() => { void onSignOut() }}><LogOut size={15}/> تسجيل الخروج</button></div>
         <div className="desktop-status"><span className={`save-indicator ${saveStatus}`}><i />{saveStatus === 'saving' ? 'جارٍ الحفظ محليًا' : saveStatus === 'error' ? 'تعذر الحفظ — راجع مساحة المتصفح' : 'كل التغييرات محفوظة محليًا'}</span><span className={`network-badge ${online ? '' : 'offline'}`}>{online ? <Wifi size={16} /> : <CloudOff size={16} />}{online ? 'متصل' : 'دون اتصال'}</span></div>
         {view === 'home' && <HomePage {...shared} onNavigate={navigate} />}
         {view === 'schedule' && <SchedulePage {...shared} />}
