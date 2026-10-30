@@ -25,7 +25,10 @@ grant select, insert, update on public.user_app_data to authenticated;
 ```
 
 ## 3. البريد وGoogle
-في Authentication → URL Configuration أضف رابط GitHub Pages للنسخة إلى قائمة Redirect URLs. في Authentication → Providers فعّل Email. لتفعيل Google أنشئ OAuth client في Google Cloud Console، ثم أدخل Client ID وClient Secret في مزوّد Google داخل Supabase، وأضف عنوان callback الذي يعرضه Supabase إلى Google Cloud Console.
+في Authentication → URL Configuration أضف الرابطين التاليين إلى قائمة Redirect URLs (مع المسار كاملًا):
+- `https://mohammedtareqabugosh-maker.github.io/Kimi-weekly/`
+- `https://mohammedtareqabugosh-maker.github.io/kimi-jadwali/?template=blank`
+اختر أحدهما كـ Site URL، وأبقِ الرابطين في Redirect URLs. في Authentication → Providers فعّل Email. لتفعيل Google أنشئ OAuth client في Google Cloud Console، ثم أدخل Client ID وClient Secret في مزوّد Google داخل Supabase، وأضف عنوان callback الذي يعرضه Supabase إلى Google Cloud Console.
 
 ## 4. البيانات
 عند أول تسجيل دخول تُنسخ بيانات المتصفح القديمة إلى مساحة حساب معزولة إذا لم يسبق ربطها بحساب آخر. تُحمّل بيانات السحابة إن كانت أحدث، وتُرفع تغييرات التطبيق إلى صف خاص بالمستخدم. لا يمكن اعتبار المصادقة الحية مكتملة قبل إدخال مفاتيح المشروع وتطبيق SQL وضبط Google OAuth ثم اختبارها.
