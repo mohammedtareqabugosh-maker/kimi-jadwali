@@ -24,11 +24,48 @@ create policy "Users can update their own app data" on public.user_app_data for 
 grant select, insert, update on public.user_app_data to authenticated;
 ```
 
-## 3. البريد وGoogle
+
+## 3. الجدول الأسبوعي المشترك بين نَسّق وصحن
+صفحة «الجدول الموحد» تستخدم جدولًا مستقلًا اسمه `public.shared_schedule`؛ إنشاء `user_app_data` وحده لا يكفي. نفّذ هذا أيضًا في SQL Editor:
+
+```sql
+create table if not exists public.shared_schedule (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  kind text not null check (kind in ('task', 'appointment', 'meal')),
+  title text not null,
+  details text not null default '',
+  starts_at timestamptz not null,
+  meal_type text not null default '',
+  calories numeric not null default 0,
+  protein numeric not null default 0,
+  carbs numeric not null default 0,
+  fat numeric not null default 0,
+  ingredients text not null default '',
+  source_app text not null default '',
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists shared_schedule_user_starts_idx
+  on public.shared_schedule (user_id, starts_at);
+
+alter table public.shared_schedule enable row level security;
+drop policy if exists "Users manage own shared schedule" on public.shared_schedule;
+create policy "Users manage own shared schedule" on public.shared_schedule
+  for all to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+grant select, insert, update, delete on public.shared_schedule to authenticated;
+```
+
+تأكد أن التطبيقين يستخدمان مشروع Supabase نفسه، وأن المستخدم يسجّل الدخول بالحساب نفسه في كليهما. إذا كان جدول `shared_schedule` موجودًا بالفعل، راجع أعمدته وسياسات RLS بدل حذف بياناته أو إعادة إنشاء الجدول.
+
+## 4. البريد وGoogle
 في Authentication → URL Configuration أضف الرابطين التاليين إلى قائمة Redirect URLs (مع المسار كاملًا):
 - `https://mohammedtareqabugosh-maker.github.io/Kimi-weekly/`
 - `https://mohammedtareqabugosh-maker.github.io/kimi-jadwali/?template=blank`
 اختر أحدهما كـ Site URL، وأبقِ الرابطين في Redirect URLs. في Authentication → Providers فعّل Email. لتفعيل Google أنشئ OAuth client في Google Cloud Console، ثم أدخل Client ID وClient Secret في مزوّد Google داخل Supabase، وأضف عنوان callback الذي يعرضه Supabase إلى Google Cloud Console.
 
-## 4. البيانات
+## 5. البيانات
 عند أول تسجيل دخول تُنسخ بيانات المتصفح القديمة إلى مساحة حساب معزولة إذا لم يسبق ربطها بحساب آخر. تُحمّل بيانات السحابة إن كانت أحدث، وتُرفع تغييرات التطبيق إلى صف خاص بالمستخدم. لا يمكن اعتبار المصادقة الحية مكتملة قبل إدخال مفاتيح المشروع وتطبيق SQL وضبط Google OAuth ثم اختبارها.
