@@ -73,7 +73,7 @@ export function executeAssistantCommand(raw: string, current: AppData, selectedD
 
   if (addVerb.test(normalized) && /(مهمه|موعد|محاضره|مذاكره|دراسه|غداء|عشاء|فطور|افطار|رياضه|شغل|عمل|نوم|راحه|وجبه)/.test(normalized)) {
     const range = text.match(/(?:من\s*)?(\d{1,2}(?::\d{2})?\s*(?:صباحا|مساء|ص|م|am|pm)?)\s*(?:الى|إلى|لحد|حتى|-)\s*(\d{1,2}(?::\d{2})?\s*(?:صباحا|مساء|ص|م|am|pm)?)/i)
-    const start = range ? minutes(range[1]) : null
+    let start = range ? minutes(range[1]) : null
     let end = range ? minutes(range[2]) : null
     if (range && end !== null && start !== null && end <= start && !/(مساء|م|pm)/i.test(range[1]) && /(مساء|م|pm)/i.test(range[2]) && start < 12 * 60) end += 12 * 60
     let title = stripVerb(text).replace(/^(مهمة|موعد)\s*/, '')
@@ -82,8 +82,18 @@ export function executeAssistantCommand(raw: string, current: AppData, selectedD
       .replace(/\s+/g, ' ').trim()
     title = title.replace(/^(مهمة|موعد)\s*/, '').trim()
     if (!title) return result(true, false, current, 'اكتب اسم المهمة. مثال: أضف مذاكرة البرمجة يوم الأحد من 19:00 إلى 20:00.')
-    if (start === null || end === null || end <= start) return result(true, false, current, 'اكتب اليوم ووقت البداية والنهاية، مثال: أضف مذاكرة البرمجة يوم الأحد من 19:00 إلى 20:00.')
     const type: TaskType = /(غداء|عشاء|فطور|افطار|وجبه)/.test(normalized) ? 'meal' : /(محاضره|جامعه)/.test(normalized) ? 'university' : /(مذاكره|دراسه)/.test(normalized) ? 'study' : /رياضه/.test(normalized) ? 'sport' : /(عمل|شغل)/.test(normalized) ? 'work' : /نوم/.test(normalized) ? 'sleep' : /راحه/.test(normalized) ? 'rest' : 'personal'
+    if (start === null || end === null || end <= start) {
+      if (range) return result(true, false, current, 'وقت المهمة غير واضح. استخدم مثلًا: أضف مذاكرة البرمجة يوم الأحد من 19:00 إلى 20:00.')
+      const duration = type === 'study' ? 60 : 30
+      let candidate = 9 * 60
+      while (candidate + duration <= 22 * 60) {
+        const busy = current.tasks.some(item => item.day === day && candidate < (minutes(item.end) ?? 0) && candidate + duration > (minutes(item.start) ?? 0))
+        if (!busy) { start = candidate; end = candidate + duration; break }
+        candidate += 30
+      }
+      if (start === null || end === null) return result(true, false, current, 'لم أجد فترة فارغة مناسبة في هذا اليوم. اكتب الوقت الذي تريده لأضيف المهمة.')
+    }
     const task: Task = { id: createId('task'), title, type, day, start: timeLabel(start), end: timeLabel(end), notes: '', fixed: ['university', 'work', 'online'].includes(type), allowSplit: ['study', 'personal', 'other'].includes(type), countsTowardsProgress: !['sleep', 'rest'].includes(type) }
     const collision = current.tasks.find(item => item.day === day && start < (minutes(item.end) ?? 0) && end! > (minutes(item.start) ?? 0))
     if (collision) return result(true, false, current, `لم أضفها لأن وقتها يتعارض مع "${collision.title}" (${collision.start}–${collision.end}). اختر وقتًا آخر.`)
