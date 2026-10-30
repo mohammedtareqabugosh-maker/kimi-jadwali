@@ -3,7 +3,7 @@ import type { AppData } from '../types'
 import { createSeedData } from '../data/seed'
 import { validateBackup } from './validation'
 
-const DB_NAME = 'jadwali-weekly'
+const DB_NAME = 'jadwali-weekly-blank-template'
 const STORE_NAME = 'local-data'
 const DATA_KEY = 'app-state'
 let databasePromise: Promise<IDBPDatabase> | null = null
