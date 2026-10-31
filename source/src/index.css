@@ -252,6 +252,10 @@ button, input, textarea, select, a { outline: none; }
 .modal-heading p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
 .form-stack { display: grid; gap: 15px; }
 .form-grid { display: grid; gap: 12px; }
+.ai-ask-form { display: grid; gap: 10px; margin-top: 14px; }
+.ai-ask-form .field-label { width: 100%; }
+.ai-ask-form .primary-button { width: 100%; }
+@media (min-width: 640px) { .ai-ask-form { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } .ai-ask-form .primary-button { width: auto; } }
 .field-label { display: grid; gap: 6px; color: var(--ink); font-size: 14px; font-weight: 700; }
 .field { width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-subtle); color: var(--ink); font-size: 16px; font-weight: 400; transition: border-color 150ms, box-shadow 150ms; }
 .field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }

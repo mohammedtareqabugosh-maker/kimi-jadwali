@@ -98,8 +98,8 @@ export function EmergencyPage({ data, selectedDay, selectedDate, onApply, onComm
       <div className="section-heading"><div><h2><Sparkles size={20} /> اسأل الذكاء الاصطناعي</h2><p>يمكنك سؤاله، أو إصدار أوامر مباشرة مثل «احذف محاضرة البرمجة يوم الأحد» و«أضف مذاكرة البرمجة يوم الأحد من 19:00 إلى 20:00». أوامر الإضافة والحذف المدعومة تعمل محليًا، والأسئلة العامة تستخدم خدمة الذكاء الاصطناعي عبر الإنترنت.</p></div></div>
       {aiMessages.length > 0 && <div className="chat-history" aria-live="polite">{aiMessages.map((message, index) => <div key={index} className={message.role === 'user' ? 'user-message' : 'assistant-message'}><p>{message.text}</p></div>)}</div>}
       {aiError && <p className="form-message" role="alert">{aiError}</p>}
-      <form className="form-actions" onSubmit={askAi} style={{ alignItems: 'stretch', marginTop: 14 }}>
-        <label className="field-label" style={{ flex: 1 }}>شو المشكلة أو السؤال؟
+      <form className="ai-ask-form" onSubmit={askAi}>
+        <label className="field-label">شو المشكلة أو السؤال؟
           <input className="field" value={aiQuestion} onChange={(event) => setAiQuestion(event.target.value)} placeholder="مثلاً: تأخرت ساعة، كيف أرتّب باقي يومي؟" maxLength={1200} disabled={aiBusy} />
         </label>
         <button type="submit" className="primary-button" disabled={aiBusy || !aiQuestion.trim()}><Sparkles size={18} />{aiBusy ? 'الذكاء الاصطناعي يفكر…' : 'اسأل المساعد'}</button>
