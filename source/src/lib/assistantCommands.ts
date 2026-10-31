@@ -1,7 +1,7 @@
 import type { AppData, Goal, Note, Task, TaskType } from '../types'
 import { createId } from './id'
 
-export interface CommandResult { handled: boolean; changed: boolean; data: AppData; reply: string }
+export interface CommandResult { handled: boolean; changed: boolean; data: AppData; reply: string; undo?: AppData; clearUndo?: boolean }
 const DAYS: Array<{ index: number; names: string[] }> = [
   { index: 0, names: ['الأحد', 'احد', 'الاحد'] },
   { index: 1, names: ['الاثنين', 'الإثنين', 'اثنين'] },
@@ -25,13 +25,32 @@ const minutes = (value: string): number | null => {
 const timeLabel = (value: number) => `${String(Math.floor(value / 60) % 24).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`
 const result = (handled: boolean, changed: boolean, data: AppData, reply: string): CommandResult => ({ handled, changed, data, reply })
 
-export function executeAssistantCommand(raw: string, current: AppData, selectedDay: number): CommandResult {
+export function executeAssistantCommand(raw: string, current: AppData, selectedDay: number, undoSnapshot?: AppData | null): CommandResult {
   const text = raw.trim()
   const normalized = normalize(text)
   const day = dayFrom(text, selectedDay)
   const deleteVerb = /^(احذف|حذف|امسح|الغ|شيل|ازل|ازيل)\s+/
   const addVerb = /^(ضيف|اضف|اضافة|حط|سجل|انشئ|اعمل)\s+/
   const stripVerb = (value: string) => value.replace(/^(احذف|حذف|امسح|الغ|شيل|ازل|ازيل|ضيف|أضف|اضف|إضف|اضافة|حط|سجل|انشئ|اعمل)\s+/, '').trim()
+
+  // Undo the last bulk deletion: put back the tasks that are missing now.
+  if (/^(ارجع|رجع|رجّع|تراجع|استرجع|استرد)/.test(normalized)) {
+    if (!undoSnapshot) return { ...result(true, false, current, 'ما في شيء أسترجعه الآن. التراجع متاح بعد أمر حذف جماعي في هذه الجلسة.') }
+    const restored = undoSnapshot.tasks.filter(task => !current.tasks.some(item => item.id === task.id))
+    const restoredIds = new Set(restored.map(task => task.id))
+    const completions = { ...undoSnapshot.completions, ...current.completions }
+    return { handled: true, changed: true, clearUndo: true, data: { ...current, tasks: [...current.tasks, ...restored], completions, updatedAt: new Date().toISOString() }, reply: restoredIds.size ? `تم استرجاع ${restoredIds.size} مهمة.` : 'لا توجد مهام محذوفة لاسترجاعها.' }
+  }
+
+  // Bulk delete of tasks: removes every non-meal task, keeps meals, goals and notes.
+  if (deleteVerb.test(normalized) && /(كل|جميع)/.test(normalized) && /(المهام|مهام|المهمات|مهمات)/.test(normalized)) {
+    const removed = current.tasks.filter(task => task.type !== 'meal')
+    if (!removed.length) return result(true, false, current, 'ما في مهام لحذفها.')
+    const keep = current.tasks.filter(task => task.type === 'meal')
+    const removedIds = new Set(removed.map(task => task.id))
+    const completions = Object.fromEntries(Object.entries(current.completions).filter(([key]) => ![...removedIds].some(id => key.includes(id))))
+    return { handled: true, changed: true, undo: current, data: { ...current, tasks: keep, completions, updatedAt: new Date().toISOString() }, reply: `تم حذف ${removed.length} مهمة. تبقّت الوجبات والأهداف والملاحظات. اكتب «ارجع المهام» للتراجع.` }
+  }
 
   // Bulk cleanup: keep meal entries while removing the rest of the schedule, goals, and notes.
   if (deleteVerb.test(normalized) && /(كل|جميع).*(ما عدا|الا).*(وجبات|الوجبات)/.test(normalized)) {

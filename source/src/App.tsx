@@ -38,6 +38,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
 
 export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail: string; onSignOut: () => Promise<void>; saveCloudData: (data: AppData) => Promise<void> }) {
   const [data, setData] = useState<AppData | null>(null)
+  const [undoSnapshot, setUndoSnapshot] = useState<AppData | null>(null)
   const [loadError, setLoadError] = useState('')
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved')
   const [view, setView] = useState<View>('home')
@@ -164,8 +165,10 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
   const commitNotes = (notes: Note[]) => { updateData((current) => ({ ...current, notes })); setToast({ message: 'حُفظت الملاحظات.' }) }
   const handleAssistantCommand = (question: string): string | null => {
     if (!data) return null
-    const command = executeAssistantCommand(question, data, selectedDay)
+    const command = executeAssistantCommand(question, data, selectedDay, undoSnapshot)
     if (!command.handled) return null
+    if (command.undo) setUndoSnapshot(command.undo)
+    if (command.clearUndo) setUndoSnapshot(null)
     if (command.changed) {
       setData(command.data)
       setToast({ message: command.reply })
