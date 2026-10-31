@@ -33,6 +33,15 @@ export function executeAssistantCommand(raw: string, current: AppData, selectedD
   const addVerb = /^(ضيف|اضف|اضافة|حط|سجل|انشئ|اعمل)\s+/
   const stripVerb = (value: string) => value.replace(/^(احذف|حذف|امسح|الغ|شيل|ازل|ازيل|ضيف|أضف|اضف|إضف|اضافة|حط|سجل|انشئ|اعمل)\s+/, '').trim()
 
+  // Bulk cleanup: keep meal entries while removing the rest of the schedule, goals, and notes.
+  if (deleteVerb.test(normalized) && /(كل|جميع).*(ما عدا|الا).*(وجبات|الوجبات)/.test(normalized)) {
+    const meals = current.tasks.filter(task => task.type === 'meal')
+    const mealIds = new Set(meals.map(task => task.id))
+    const completions = Object.fromEntries(Object.entries(current.completions).filter(([key]) => [...mealIds].some(id => key.includes(id))))
+    const now = new Date().toISOString()
+    return result(true, true, { ...current, tasks: meals, goals: [], notes: [], completions, updatedAt: now }, `تم الحذف. أبقيت ${meals.length} وجبة، وحذفت باقي المهام والأهداف والملاحظات.`)
+  }
+
   if (deleteVerb.test(normalized)) {
     let target = stripVerb(normalized).replace(/^(المهمه|مهمه|الوجبه|وجبه|الهدف|هدف|الملاحظه|ملاحظه)\s+/, '').trim()
     const daySpecified = DAYS.some(d => d.names.some(name => normalized.includes(normalize(name))))
